@@ -11,7 +11,11 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Chewy&family=Varela+Round&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Config -->
@@ -25,12 +29,12 @@
                     fontFamily: {
                         sans: ['Nunito', 'sans-serif'],
                         cursive: ['Nunito', 'cursive'],
+                        chewy: ['Chewy', 'cursive'],
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -49,16 +53,55 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .font-cursive {
-            font-weight: 800;
-            font-style: italic;
-        }
-
         html {
             scroll-behavior: smooth;
         }
 
-        /* --- TOAST NOTIFICATIONS --- */
+        /* --- FLAME ANIMATIONS --- */
+        .flame {
+            transform-origin: center bottom;
+            animation: flicker 1.5s infinite ease-in-out;
+        }
+
+        .flame-out {
+            animation: popOut 0.3s forwards !important;
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.4);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* --- TOASTS --- */
         #toast-container {
             position: fixed;
             top: 20px;
@@ -103,7 +146,7 @@
             border-left: 4px solid #ef4444;
         }
 
-        /* --- ANIMATIONS & FX --- */
+        /* --- UI ELEMENTS --- */
         .btn-gift {
             background: #FF0055;
             box-shadow: 0 4px 14px 0 rgba(255, 0, 85, 0.39);
@@ -113,10 +156,6 @@
         .btn-gift:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 0, 85, 0.23);
-        }
-
-        .btn-gift:active:not(:disabled) {
-            transform: translateY(0);
         }
 
         .btn-gift:disabled {
@@ -140,40 +179,7 @@
             display: flex;
         }
 
-        /* Real Flame Animation for SVG */
-        .flame-real {
-            transform-origin: center bottom;
-            animation: flameWaver 3s ease-in-out infinite alternate;
-        }
-
-        .flame-inner {
-            animation: flameFlicker 0.1s ease-in-out infinite alternate;
-            transform-origin: center bottom;
-        }
-
-        @keyframes flameWaver {
-            0% {
-                transform: rotate(-2deg);
-            }
-
-            100% {
-                transform: rotate(2deg);
-            }
-        }
-
-        @keyframes flameFlicker {
-            0% {
-                transform: scale(1);
-                opacity: 0.9;
-            }
-
-            100% {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-        }
-
-        /* Premium Themes */
+        /* Themes */
         .bg-love {
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         }
@@ -234,13 +240,9 @@
 <body
     class="bg-brand-bg text-gray-800 selection:bg-pink-100 selection:text-brand-pink overflow-x-hidden flex flex-col min-h-screen">
 
-    <!-- LOAD CONFIG -->
     <script src="config.js"></script>
-
-    <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
 
-    <!-- NAVBAR -->
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 h-16 transition-all">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
             <a href="#home" class="flex items-center gap-2 group">
@@ -262,10 +264,7 @@
         </div>
     </nav>
 
-    <!-- MAIN APP CONTENT -->
     <main class="pt-16 flex-grow flex flex-col relative">
-
-        <!-- VIEW: HOME -->
         <div id="view-home" class="view-section hidden">
             <!-- Hero -->
             <section class="bg-gradient-to-b from-purple-50 via-white to-white pt-24 pb-20 px-4 text-center">
@@ -309,7 +308,7 @@
                 </div>
             </section>
 
-            <!-- Testimonials (Restored) -->
+            <!-- Testimonials -->
             <section class="py-20 bg-white border-t border-gray-100">
                 <div class="max-w-6xl mx-auto px-4">
                     <h2 class="text-3xl font-extrabold text-center text-brand-navy mb-12">Wall of Love 💖</h2>
@@ -390,7 +389,6 @@
                     class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition"><i
                         class="fas fa-plus"></i> New Wish</a>
             </div>
-            <!-- Premium Banner -->
             <div id="premium-banner"
                 class="hidden bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
                 <div>
@@ -515,6 +513,114 @@
 
     <!-- APP LOGIC -->
     <script>
+        // --- CAKE REGISTRY ---
+        const CakeFactory = {
+            // 1. Simple SVG for Free Users (Standard Vector)
+            getSimpleCake() {
+                return `
+                    <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="100" cy="170" rx="90" ry="15" fill="#f0f0f0" />
+                        <ellipse cx="100" cy="168" rx="90" ry="15" fill="#e0e0e0" />
+                        <path d="M40 110 L40 150 C40 165 160 165 160 150 L160 110" fill="#8B4513" />
+                        <ellipse cx="100" cy="110" rx="60" ry="20" fill="#A0522D" />
+                        <path d="M38 110 C38 110 50 130 70 115 C90 100 110 130 130 115 C150 100 162 110 162 110 L162 100 C162 100 100 80 38 100 Z" fill="#FFC0CB" />
+                        <ellipse cx="100" cy="100" rx="62" ry="22" fill="#FFB6C1" />
+                        <rect x="92" y="60" width="16" height="50" rx="2" fill="#F44336" />
+                        <path d="M92 70 L108 65" stroke="white" stroke-width="2" stroke-opacity="0.5" />
+                        <g class="flame">
+                            <path d="M100 60 Q105 50 100 25 Q95 50 100 60" fill="#FFD700" />
+                            <path d="M100 55 Q103 48 100 35 Q97 48 100 55" fill="#FFA500" />
+                        </g>
+                    </svg>
+                `;
+            },
+
+            // 2. High-Fidelity "Real" Cake (From your Personal Project)
+            getPremiumCake() {
+                return `
+                    <svg id="birthday-cake" width="300" height="300" viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="5" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+                        <g id="whole-cake">
+                            <g id="plate">
+                                <ellipse cx="500" cy="750" rx="380" ry="100" fill="#ffa500" />
+                                <ellipse cx="500" cy="730" rx="370" ry="90" fill="#f5b847" />
+                            </g>
+                            <g id="cake-sponge">
+                                <rect x="150" y="450" width="700" height="300" rx="50" fill="#5e2b14" />
+                            </g>
+                            <g id="frosting">
+                                <path d="M 140 450 C 140 550, 180 620, 220 550 Q 250 500, 280 550 C 300 600, 360 620, 390 530 Q 420 490, 460 560 C 480 640, 540 640, 560 550 Q 590 500, 620 560 C 640 620, 700 610, 730 530 Q 760 490, 790 540 C 800 580, 860 550, 860 450 A 360 80 0 0 0 140 450" fill="#f0e4c3" />
+                                <ellipse cx="500" cy="450" rx="300" ry="60" fill="#ffffff" opacity="0.3" />
+                            </g>
+                            <g id="sprinkles">
+                                <rect x="250" y="420" width="12" height="40" rx="6" fill="#ff9f43" transform="rotate(-30 256 440)" />
+                                <rect x="420" y="400" width="12" height="35" rx="6" fill="#ff9f43" transform="rotate(45 426 417)" />
+                                <rect x="580" y="410" width="12" height="38" rx="6" fill="#ff9f43" transform="rotate(-20 586 429)" />
+                                <rect x="750" y="425" width="12" height="40" rx="6" fill="#ff9f43" transform="rotate(35 756 445)" />
+                                <rect x="320" y="435" width="12" height="36" rx="6" fill="#7cb342" transform="rotate(60 326 453)" />
+                                <rect x="650" y="440" width="12" height="36" rx="6" fill="#7cb342" transform="rotate(-45 656 458)" />
+                                <rect x="380" y="450" width="12" height="32" rx="6" fill="#e8d5b7" transform="rotate(25 386 466)" />
+                                <rect x="700" y="455" width="12" height="32" rx="6" fill="#e8d5b7" transform="rotate(-60 706 471)" />
+                            </g>
+                            <g id="candles">
+                                <g class="candle">
+                                    <rect x="280" y="360" width="50" height="100" rx="8" fill="#ffd700" />
+                                    <g class="flame" style="transform-origin: 305px 330px;">
+                                        <path d="M 305 330 Q 290 280 305 240 Q 320 280 305 330" fill="#ffb700" filter="url(#glow)" />
+                                        <path d="M 305 325 Q 298 290 305 260 Q 312 290 305 325" fill="#ffd700" />
+                                    </g>
+                                </g>
+                                <g class="candle">
+                                    <rect x="400" y="340" width="50" height="100" rx="8" fill="#66bb6a" />
+                                    <g class="flame" style="transform-origin: 425px 310px;">
+                                        <path d="M 425 310 Q 410 260 425 220 Q 440 260 425 310" fill="#ffb700" filter="url(#glow)" />
+                                        <path d="M 425 305 Q 418 270 425 240 Q 432 270 425 305" fill="#ffd700" />
+                                    </g>
+                                </g>
+                                <g class="candle">
+                                    <rect x="550" y="340" width="50" height="100" rx="8" fill="#ef9a9a" />
+                                    <g class="flame" style="transform-origin: 575px 310px;">
+                                        <path d="M 575 310 Q 560 260 575 220 Q 590 260 575 310" fill="#ffb700" filter="url(#glow)" />
+                                        <path d="M 575 305 Q 568 270 575 240 Q 582 270 575 305" fill="#ffd700" />
+                                    </g>
+                                </g>
+                                <g class="candle">
+                                    <rect x="670" y="360" width="50" height="100" rx="8" fill="#80deea" />
+                                    <g class="flame" style="transform-origin: 695px 330px;">
+                                        <path d="M 695 330 Q 680 280 695 240 Q 710 280 695 330" fill="#ffb700" filter="url(#glow)" />
+                                        <path d="M 695 325 Q 688 290 695 260 Q 702 290 695 325" fill="#ffd700" />
+                                    </g>
+                                </g>
+                                <g class="candle">
+                                    <rect x="500" y="380" width="50" height="100" rx="8" fill="#ba68c8" />
+                                    <g class="flame" style="transform-origin: 525px 350px;">
+                                        <path d="M 525 350 Q 510 300 525 260 Q 540 300 525 350" fill="#ffb700" filter="url(#glow)" />
+                                        <path d="M 525 345 Q 518 310 525 280 Q 532 310 525 345" fill="#ffd700" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                `;
+            },
+
+            // 3. Dark Chocolate Cake (for Midnight Theme)
+            getMidnightCake() {
+                // Copy of premium but with dark chocolate colors
+                let svg = this.getPremiumCake();
+                // Replace colors for dark theme
+                svg = svg.replace(/#5e2b14/g, "#3e1e0f"); // Darker sponge
+                svg = svg.replace(/#f0e4c3/g, "#5D4037"); // Chocolate frosting
+                svg = svg.replace(/#ffffff/g, "#8D6E63"); // Frosting highlight
+                return svg;
+            }
+        };
+
         const App = {
             State: {
                 user: null,
@@ -523,7 +629,8 @@
                 audioContext: null,
                 microphone: null,
                 analyser: null,
-                isBlowing: false
+                isBlowing: false,
+                mediaStream: null
             },
 
             UI: {
@@ -580,14 +687,12 @@
 
             Services: {
                 supabase: null,
-
                 init() {
                     if (typeof CONFIG === 'undefined') {
                         App.UI.toast('Config missing!', 'error');
                         return;
                     }
                     this.supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-
                     this.supabase.auth.onAuthStateChange((event, session) => {
                         App.State.user = session?.user || null;
                         App.Controllers.updateNav();
@@ -599,21 +704,15 @@
                         }
                     });
                 },
-
                 async login() {
-                    const { error } = await this.supabase.auth.signInWithOAuth({
-                        provider: 'google',
-                        options: { redirectTo: window.location.origin }
-                    });
+                    const { error } = await this.supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
                     if (error) App.UI.toast(error.message, 'error');
                 },
-
                 async logout() {
                     await this.supabase.auth.signOut();
                     App.UI.toast('Logged out successfully');
                     App.Router.go('home');
                 },
-
                 async uploadImage(file) {
                     const formData = new FormData();
                     formData.append('file', file);
@@ -623,7 +722,6 @@
                     const data = await res.json();
                     return data.secure_url;
                 },
-
                 checkPremium() {
                     if (!App.State.user) return;
                     const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
@@ -634,7 +732,6 @@
                         if (banner) banner.classList.add('hidden');
                     }
                 },
-
                 buyPremium() {
                     this.triggerPayment(4900, "WishLink Premium", "Unlock all themes", () => {
                         App.UI.toast("Payment Successful! Premium Unlocked 👑");
@@ -642,24 +739,18 @@
                         App.Services.checkPremium();
                     });
                 },
-
                 buyCoffee(amount) {
                     this.triggerPayment(amount * 100, "Buy us a Coffee", "Thanks for your support! ☕", () => {
                         App.UI.toast("Thank you for the coffee! ❤️");
                     });
                 },
-
                 triggerPayment(amount, name, desc, successCallback) {
                     if (typeof Razorpay === 'undefined' || !CONFIG.RAZORPAY_KEY) {
                         alert("Payment Config Missing. Simulating success for demo.");
                         successCallback();
                         return;
                     }
-                    const options = {
-                        key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR",
-                        name: name, description: desc,
-                        handler: function (response) { successCallback(); }
-                    };
+                    const options = { key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR", name: name, description: desc, handler: function (response) { successCallback(); } };
                     const rzp = new Razorpay(options);
                     rzp.open();
                 }
@@ -671,7 +762,6 @@
                     bgMusic.volume = 0.4;
                     bgMusic.play().catch(() => console.log('Autoplay blocked'));
                 },
-
                 stopAll() {
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
@@ -679,20 +769,18 @@
                     cheer.pause(); cheer.currentTime = 0;
                     this.stopMic();
                 },
-
                 async initMic(onBlow) {
                     try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        App.State.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                         App.State.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                         App.State.analyser = App.State.audioContext.createAnalyser();
-                        App.State.microphone = App.State.audioContext.createMediaStreamSource(stream);
+                        App.State.microphone = App.State.audioContext.createMediaStreamSource(App.State.mediaStream);
                         App.State.microphone.connect(App.State.analyser);
                         App.State.analyser.fftSize = 256;
 
                         const bufferLength = App.State.analyser.frequencyBinCount;
                         const dataArray = new Uint8Array(bufferLength);
 
-                        // Visual Indicator
                         const btn = document.getElementById('mic-btn');
                         if (btn) {
                             btn.innerHTML = '<i class="fas fa-microphone-lines fa-beat"></i> Listening...';
@@ -703,34 +791,32 @@
                         const detectBlow = () => {
                             if (!App.State.audioContext) return;
                             App.State.analyser.getByteFrequencyData(dataArray);
-
                             let sum = 0;
                             for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
                             const average = sum / bufferLength;
-
-                            if (average > 50) {
-                                onBlow();
-                                this.stopMic();
-                            } else {
-                                requestAnimationFrame(detectBlow);
-                            }
+                            if (average > 40) { onBlow(); this.stopMic(); } else { requestAnimationFrame(detectBlow); }
                         };
                         detectBlow();
-                        App.UI.toast("Blow on your screen! 🎂");
+                        App.UI.toast("Microphone Active! Blow on the screen 💨");
                     } catch (err) {
                         console.error("Mic error", err);
                         App.UI.toast("Microphone denied. Tap the cake instead.", "error");
                     }
                 },
-
                 stopMic() {
+                    if (App.State.mediaStream) {
+                        App.State.mediaStream.getTracks().forEach(track => track.stop());
+                        App.State.mediaStream = null;
+                    }
                     if (App.State.audioContext) {
                         App.State.audioContext.close();
                         App.State.audioContext = null;
                     }
-                    if (App.State.microphone) {
-                        App.State.microphone.disconnect();
-                        App.State.microphone = null;
+                    const btn = document.getElementById('mic-btn');
+                    if (btn) {
+                        btn.innerHTML = '<i class="fas fa-microphone"></i> Enable Mic';
+                        btn.classList.add('bg-white', 'text-brand-navy');
+                        btn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
                     }
                 }
             },
@@ -740,24 +826,18 @@
                     window.addEventListener('hashchange', this.handleRoute.bind(this));
                     window.addEventListener('load', this.handleRoute.bind(this));
                 },
-
                 go(route) { window.location.hash = `#${route}`; },
-
                 handleRoute() {
                     App.Audio.stopAll();
-
                     const hash = window.location.hash.slice(1) || 'home';
                     const [route, param] = hash.split('/');
-
                     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-
                     const activeView = document.getElementById(`view-${route}`);
                     if (activeView) {
                         activeView.classList.remove('hidden');
                         activeView.classList.add('animate-fade-in');
                         window.scrollTo(0, 0);
                     }
-
                     if (route === 'dashboard') App.Controllers.loadDashboard();
                     if (route === 'create') App.UI.renderThemes();
                     if (route === 'wish' && param) App.Controllers.loadWish(param);
@@ -777,7 +857,6 @@
                         container.innerHTML = `<button onclick="App.Router.go('login')" class="text-brand-navy hover:text-brand-pink transition font-bold">Login</button>`;
                     }
                 },
-
                 selectTheme(id, isPremium) {
                     if (isPremium && !App.State.isPremium) {
                         App.UI.toast("This theme requires Premium upgrade 👑", "error");
@@ -786,7 +865,6 @@
                     App.State.currentTheme = id;
                     App.UI.renderThemes();
                 },
-
                 async handleCreate(e) {
                     e.preventDefault();
                     if (!App.State.user) {
@@ -795,47 +873,34 @@
                         App.Router.go('login');
                         return;
                     }
-
                     const btn = document.getElementById('submit-btn');
                     App.UI.setLoading(btn, true, "Wrapping Gift...");
-
                     try {
                         const fileInput = document.getElementById('image-upload');
                         let imgUrl = null;
-
                         if (fileInput.files.length) {
                             App.UI.setLoading(btn, true, "Uploading Photo...");
                             imgUrl = await App.Services.uploadImage(fileInput.files[0]);
                         }
-
                         App.UI.setLoading(btn, true, "Finalizing...");
-
-                        const { data, error } = await App.Services.supabase
-                            .from('wishes')
-                            .insert([{
-                                recipient_name: document.getElementById('recipient').value,
-                                message: document.getElementById('message').value,
-                                theme: App.State.currentTheme,
-                                image_url: imgUrl,
-                                creator_id: App.State.user.id
-                            }])
-                            .select()
-                            .single();
-
+                        const { data, error } = await App.Services.supabase.from('wishes').insert([{
+                            recipient_name: document.getElementById('recipient').value,
+                            message: document.getElementById('message').value,
+                            theme: App.State.currentTheme,
+                            image_url: imgUrl,
+                            creator_id: App.State.user.id
+                        }]).select().single();
                         if (error) throw error;
-
                         App.Controllers.showShareModal(data.id);
                         document.getElementById('create-form').reset();
                         App.State.currentTheme = 'classic';
                         App.UI.renderThemes();
-
                     } catch (err) {
                         App.UI.toast(err.message || "Something went wrong", "error");
                     } finally {
                         App.UI.setLoading(btn, false);
                     }
                 },
-
                 showShareModal(id) {
                     const url = `${window.location.origin}/#wish/${id}`;
                     const modal = document.createElement('div');
@@ -857,24 +922,17 @@
                     `;
                     document.body.appendChild(modal);
                 },
-
                 async loadDashboard() {
                     if (!App.State.user) return App.Router.go('login');
-
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
-
                     const banner = document.getElementById('premium-banner');
                     if (banner && !App.State.isPremium) banner.classList.remove('hidden');
-
-                    const { data, error } = await App.Services.supabase
-                        .from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
-
+                    const { data, error } = await App.Services.supabase.from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
                     if (!data || data.length === 0) {
                         list.innerHTML = `<div class="text-center py-10 border-2 border-dashed rounded-xl bg-gray-50 text-gray-400">No wishes yet. Create one!</div>`;
                         return;
                     }
-
                     list.innerHTML = data.map(w => `
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition">
                             <div class="flex items-center gap-4">
@@ -888,28 +946,20 @@
                         </div>
                     `).join('');
                 },
-
                 async deleteWish(id) {
                     if (!confirm("Delete this wish?")) return;
                     await App.Services.supabase.from('wishes').delete().eq('id', id);
                     this.loadDashboard();
                     App.UI.toast("Wish deleted");
                 },
-
                 async loadWish(id) {
                     const container = document.getElementById('wish-content');
                     container.innerHTML = '<div class="text-white flex flex-col items-center gap-4"><i class="fas fa-birthday-cake fa-bounce text-5xl"></i><p>Baking the cake...</p></div>';
-
                     const { data, error } = await App.Services.supabase.from('wishes').select('*').eq('id', id).single();
-
-                    if (error || !data) {
-                        container.innerHTML = '<div class="text-white text-xl">Wish not found 😢</div>';
-                        return;
-                    }
+                    if (error || !data) { container.innerHTML = '<div class="text-white text-xl">Wish not found 😢</div>'; return; }
 
                     const view = document.getElementById('view-wish');
                     view.className = "view-section min-h-screen w-full relative overflow-hidden flex flex-col items-center justify-center";
-
                     if (data.theme === 'love') view.classList.add('bg-love');
                     else if (data.theme === 'midnight') view.classList.add('bg-midnight');
                     else {
@@ -917,6 +967,13 @@
                         view.classList.add('bg-gradient-to-br');
                         const grad = colors[data.theme] || colors.classic;
                         grad.split(' ').forEach(c => view.classList.add(c));
+                    }
+
+                    // Cake Selection Logic
+                    let cakeSVG = CakeFactory.getSimpleCake(); // Default for free
+                    if (data.theme === 'love' || data.theme === 'midnight') {
+                        // Premium Cake for premium themes
+                        cakeSVG = data.theme === 'midnight' ? CakeFactory.getMidnightCake() : CakeFactory.getPremiumCake();
                     }
 
                     let particles = '';
@@ -930,42 +987,14 @@
 
                     container.innerHTML = `
                         ${particles}
-                        
                         <div id="phase-1" class="text-center z-20 transition-all duration-700 flex flex-col items-center">
                             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive animate-slide-up">
                                 Happy Birthday <br> <span class="text-yellow-300">${data.recipient_name}</span>!
                             </h1>
-                            
-                            <!-- REALISTIC SVG CAKE -->
                             <div class="relative cursor-pointer hover:scale-105 transition duration-300 inline-block mt-8 animate-bounce-in" onclick="App.Controllers.blowCandle()">
-                                <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Plate -->
-                                    <ellipse cx="100" cy="170" rx="90" ry="15" fill="#f0f0f0" />
-                                    <ellipse cx="100" cy="168" rx="90" ry="15" fill="#e0e0e0" />
-                                    
-                                    <!-- Cake Base -->
-                                    <path d="M40 110 L40 150 C40 165 160 165 160 150 L160 110" fill="#8B4513" />
-                                    <ellipse cx="100" cy="110" rx="60" ry="20" fill="#A0522D" />
-                                    
-                                    <!-- Frosting/Icing -->
-                                    <path d="M38 110 C38 110 50 130 70 115 C90 100 110 130 130 115 C150 100 162 110 162 110 L162 100 C162 100 100 80 38 100 Z" fill="#FFC0CB" />
-                                    <ellipse cx="100" cy="100" rx="62" ry="22" fill="#FFB6C1" />
-                                    
-                                    <!-- Candle -->
-                                    <rect x="92" y="60" width="16" height="50" rx="2" fill="#F44336" />
-                                    <path d="M92 70 L108 65" stroke="white" stroke-width="2" stroke-opacity="0.5" />
-                                    <path d="M92 85 L108 80" stroke="white" stroke-width="2" stroke-opacity="0.5" />
-                                    
-                                    <!-- Flame -->
-                                    <g id="flame" class="flame-real">
-                                        <path d="M100 60 Q105 50 100 25 Q95 50 100 60" fill="#FFD700" />
-                                        <path d="M100 55 Q103 48 100 35 Q97 48 100 55" fill="#FFA500" class="flame-inner" />
-                                    </g>
-                                </svg>
+                                ${cakeSVG}
                             </div>
-
-                            <!-- CONTROLS -->
-                            <div class="mt-8 flex gap-4 animate-slide-up" style="animation-delay: 0.2s">
+                            <div class="mt-8 flex flex-wrap justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
                                 <button id="mic-btn" onclick="App.Audio.initMic(App.Controllers.blowCandle)" class="bg-white text-brand-navy px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2 border-2 border-transparent">
                                     <i class="fas fa-microphone"></i> Enable Mic to Blow
                                 </button>
@@ -974,8 +1003,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Phase 2: Card -->
                         <div id="phase-2" class="hidden opacity-0 transform translate-y-10 transition-all duration-1000 z-20 max-w-lg w-full px-4">
                             <div class="${cardClass} backdrop-blur-xl rounded-3xl p-8 shadow-2xl border relative text-center">
                                 ${data.image_url ? `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white shadow-lg">` : ''}
@@ -987,49 +1014,37 @@
                             </div>
                         </div>
                     `;
-
-                    // Auto-start music on first click anywhere
-                    document.body.addEventListener('click', function musicStarter() {
-                        App.Audio.startMusic();
-                        document.body.removeEventListener('click', musicStarter);
-                    }, { once: true });
+                    const playMusic = () => { App.Audio.startMusic(); document.body.removeEventListener('click', playMusic); document.body.removeEventListener('touchstart', playMusic); };
+                    document.body.addEventListener('click', playMusic);
+                    document.body.addEventListener('touchstart', playMusic);
                 },
-
                 blowCandle() {
-                    const flame = document.getElementById('flame');
-                    if (!flame || flame.classList.contains('hidden')) return;
-
-                    flame.classList.add('hidden');
-                    App.Audio.stopMic(); // Important: Kill mic immediately
-
+                    const flames = document.querySelectorAll('.flame');
+                    if (flames.length === 0 || flames[0].classList.contains('hidden')) return;
+                    flames.forEach(flame => flame.classList.add('flame-out'));
+                    App.Audio.stopMic();
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
                     bg.pause();
                     cheer.play();
-
                     App.Controllers.startConfetti();
-
-                    const p1 = document.getElementById('phase-1');
-                    const p2 = document.getElementById('phase-2');
-
-                    p1.style.opacity = '0';
-                    p1.style.transform = 'scale(0.9)';
-
                     setTimeout(() => {
-                        p1.classList.add('hidden');
-                        p2.classList.remove('hidden');
-                        requestAnimationFrame(() => {
-                            p2.classList.remove('opacity-0', 'translate-y-10');
-                        });
-                    }, 600);
+                        const p1 = document.getElementById('phase-1');
+                        const p2 = document.getElementById('phase-2');
+                        p1.style.opacity = '0';
+                        p1.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            p1.classList.add('hidden');
+                            p2.classList.remove('hidden');
+                            requestAnimationFrame(() => { p2.classList.remove('opacity-0', 'translate-y-10'); });
+                        }, 600);
+                    }, 300);
                 },
-
                 startConfetti() {
                     const canvas = document.getElementById('confetti-canvas');
                     const ctx = canvas.getContext('2d');
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
-
                     const particles = Array.from({ length: 150 }, () => ({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height - canvas.height,
@@ -1038,7 +1053,6 @@
                         speedY: Math.random() * 3 + 2,
                         speedX: Math.random() * 2 - 1
                     }));
-
                     function loop() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         particles.forEach(p => {
