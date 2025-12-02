@@ -7,12 +7,14 @@
     <title>WishLink - Create Magic Moments</title>
     <link rel="icon" type="image/png" href="favicon.png">
 
+    <!-- Dependencies -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -61,9 +63,8 @@
             font-weight: 800;
         }
 
-        /* --- THEME ANIMATIONS (Strictly Optimized) --- */
-
-        /* LOVE THEME: Gentle Pulse Pattern */
+        /* --- STRICTLY DESIGNED THEMES --- */
+        /* Love: Gentle Pulse Pattern (No more messy floating divs) */
         .bg-love {
             background-color: #fff0f3;
             background-image: radial-gradient(#ff0055 0.5px, transparent 0.5px), radial-gradient(#ff0055 0.5px, #fff0f3 0.5px);
@@ -79,7 +80,7 @@
             pointer-events: none;
         }
 
-        /* OCEAN THEME: Parallax Waves */
+        /* Ocean: Parallax Waves (SVG) */
         .ocean-wave {
             position: absolute;
             bottom: 0;
@@ -91,7 +92,7 @@
             background-size: 50% 100%;
         }
 
-        /* SUNSHINE THEME: Rotating Rays */
+        /* Sunshine: Rotating Rays */
         .sun-rays {
             position: absolute;
             top: 50%;
@@ -104,7 +105,7 @@
             pointer-events: none;
         }
 
-        /* MIDNIGHT THEME: Shooting Stars */
+        /* Midnight: Shooting Stars */
         .bg-midnight {
             background: linear-gradient(to bottom, #0f172a, #1e1b4b);
             color: white;
@@ -123,7 +124,7 @@
             filter: drop-shadow(0 0 6px white);
         }
 
-        /* Cake Animations */
+        /* Cake Interactions */
         @keyframes flicker {
 
             0%,
@@ -139,7 +140,7 @@
         }
 
         .animate-flicker {
-            animation: flicker 0.5s infinite alternate;
+            animation: flicker 0.1s infinite alternate;
         }
 
         /* UI Elements */
@@ -167,28 +168,39 @@
 
 <body class="bg-brand-bg text-gray-800 selection:bg-pink-100 selection:text-brand-pink">
 
+    <!-- 1. LOAD CONFIG -->
     <script src="config.js"></script>
 
+    <!-- Toast Container -->
     <div id="toast-container"></div>
 
+    <!-- CEREMONY OVERLAY (For Premium Blow Feature) -->
     <div id="ceremony-overlay"
         class="fixed inset-0 bg-black z-[100] hidden flex-col items-center justify-center text-white text-center p-8 transition-opacity duration-1000">
         <div id="ceremony-text"
             class="text-2xl md:text-4xl font-cursive opacity-0 transition-opacity duration-1000 leading-relaxed">
+            <!-- Text injected via JS -->
         </div>
         <div id="mic-permission-ui" class="hidden flex-col items-center animate-fade-in mt-8">
             <div
-                class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4 text-2xl animate-pulse">
+                class="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mb-6 text-3xl animate-pulse ring-4 ring-white/5">
                 🎤</div>
-            <p class="mb-6 text-gray-300">We need to hear you blow out the candles.</p>
+            <h3 class="text-xl font-bold mb-2">Enable Magic Mode?</h3>
+            <p class="mb-6 text-gray-300 max-w-xs text-sm">We need your microphone to detect when you blow out the
+                candles.</p>
             <button onclick="startMicSequence()"
-                class="px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition">Enable Magic
-                ✨</button>
+                class="px-8 py-3 bg-brand-pink text-white font-bold rounded-full hover:scale-105 transition shadow-lg shadow-pink-500/30">Enable
+                Microphone</button>
             <button onclick="skipMic()" class="mt-4 text-sm text-gray-500 hover:text-white transition">No thanks, I'll
                 tap</button>
         </div>
+        <!-- Visual Mic Meter (Hidden initially) -->
+        <div id="mic-meter" class="hidden mt-8 w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div id="mic-level" class="h-full bg-green-400 w-0 transition-all duration-75 ease-out"></div>
+        </div>
     </div>
 
+    <!-- NAVBAR -->
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-40 h-16 transition-all" id="navbar">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
             <a href="/" data-link class="flex items-center gap-2 group">
@@ -217,8 +229,10 @@
         </div>
     </nav>
 
+    <!-- CONTENT WRAPPER -->
     <main class="pt-16 min-h-screen flex flex-col">
 
+        <!-- VIEW: HOME -->
         <div id="view-home" class="block animate-fade-in">
             <section class="bg-gradient-to-b from-purple-50 via-white to-white pt-24 pb-20 px-4 text-center">
                 <span
@@ -237,6 +251,7 @@
                         class="btn-gift px-8 py-4 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl">Gift
                         this Wish 🎁</button>
                 </div>
+                <!-- Preview Card -->
                 <div class="mt-20 max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-[6px] border-white transform -rotate-1 hover:rotate-0 transition duration-700 ease-out cursor-pointer group"
                     onclick="navigateTo('/create')">
                     <div class="bg-gray-100 h-10 flex items-center px-4 gap-2 border-b border-gray-200">
@@ -258,6 +273,7 @@
             </section>
         </div>
 
+        <!-- VIEW: LOGIN -->
         <div id="view-login" class="hidden flex items-center justify-center flex-1 px-4 animate-fade-in bg-gray-50">
             <div class="bg-white p-10 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-gray-100">
                 <div
@@ -272,6 +288,7 @@
             </div>
         </div>
 
+        <!-- VIEW: DASHBOARD -->
         <div id="view-dashboard" class="hidden max-w-4xl mx-auto px-4 py-10 w-full animate-fade-in">
             <div class="flex justify-between items-end mb-8">
                 <div>
@@ -293,9 +310,10 @@
                     class="bg-white text-orange-500 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-50 shadow-sm transition">Upgrade
                     $1</button>
             </div>
-            <div id="my-wishes-list" class="grid gap-4"></div>
+            <div id="my-wishes-list" class="grid gap-4"><!-- Injected via JS --></div>
         </div>
 
+        <!-- VIEW: CREATE -->
         <div id="view-create" class="hidden max-w-2xl mx-auto px-4 py-10 w-full animate-fade-in">
             <div class="bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100">
                 <h2 class="text-3xl font-bold text-brand-navy mb-8 text-center">Create a New Wish ✨</h2>
@@ -310,9 +328,11 @@
                         <textarea id="message" required rows="4" placeholder="Write something sweet..."
                             class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-pink/20 outline-none transition"></textarea>
                     </div>
+                    <!-- Themes -->
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-gray-700 mb-4 ml-1">Choose a Theme</label>
                         <div class="grid grid-cols-3 gap-4">
+                            <!-- Free Themes -->
                             <div class="theme-card active cursor-pointer group relative" data-theme="classic">
                                 <div
                                     class="h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl opacity-80 transition-all duration-300 group-hover:opacity-100">
@@ -346,6 +366,7 @@
                                 </div>
                                 <div class="theme-label text-center text-xs mt-2 font-bold text-gray-400">Sunshine</div>
                             </div>
+                            <!-- Premium Themes -->
                             <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl"
                                 data-theme="midnight">
                                 <div
@@ -378,10 +399,11 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Add a Photo</label>
-                        <input type="file" id="image-upload" accept="image/*" onchange="updateFileName(this)"
+                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Add a Memory</label>
+                        <!-- Updated Input for Video support -->
+                        <input type="file" id="media-upload" accept="image/*,video/*" onchange="updateFileName(this)"
                             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-pink-50 file:text-brand-pink hover:file:bg-pink-100" />
-                        <p id="file-upload-text" class="text-xs text-gray-400 mt-2 ml-1">Supports JPG/PNG.</p>
+                        <p id="file-upload-text" class="text-xs text-gray-400 mt-2 ml-1">Photo or Video (Max 10MB)</p>
                     </div>
                     <button type="submit" id="submit-btn"
                         class="w-full py-4 btn-gift text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 mt-8">Gift
@@ -390,11 +412,13 @@
             </div>
         </div>
 
+        <!-- VIEW: PUBLIC WISH -->
         <div id="view-wish" class="hidden min-h-screen animate-fade-in w-full relative overflow-hidden">
-            <div id="theme-bg-layer" class="absolute inset-0 z-0"></div> <canvas id="confetti-canvas"
-                class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+            <div id="theme-bg-layer" class="absolute inset-0 z-0"></div> <!-- SVG/CSS Backgrounds go here -->
+            <canvas id="confetti-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
 
             <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 text-center">
+                <!-- PHASE 1: CAKE -->
                 <div id="phase-1" class="animate-fade-in">
                     <div
                         class="text-white text-sm md:text-lg font-bold tracking-[0.2em] mb-4 opacity-90 uppercase text-shadow-sm">
@@ -427,10 +451,12 @@
                     </div>
                 </div>
 
+                <!-- PHASE 2: MESSAGE CARD -->
                 <div id="phase-2"
                     class="hidden max-w-2xl w-full mx-auto transform translate-y-20 opacity-0 transition-all duration-1000">
                     <div id="wish-card-inner"
                         class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-white/50 relative overflow-hidden">
+                        <!-- Content Injected via JS -->
                     </div>
                     <div class="mt-10">
                         <a href="/create" data-link
@@ -441,6 +467,7 @@
             </div>
         </div>
 
+        <!-- VIEW: ADMIN -->
         <div id="view-admin" class="hidden max-w-6xl mx-auto px-4 py-10 w-full animate-fade-in">
             <h2 class="text-2xl font-bold mb-4 text-brand-navy">Admin Dashboard</h2>
             <div class="bg-white p-6 rounded-xl shadow">
@@ -449,6 +476,7 @@
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="bg-gray-900 text-gray-400 py-10 text-center mt-auto border-t border-gray-800">
         <div class="flex items-center justify-center gap-2 mb-6">
             <span class="font-bold text-white tracking-wide">WishLink</span>
@@ -459,6 +487,7 @@
         <p class="text-xs text-gray-600">&copy; 2025 WishLink.</p>
     </footer>
 
+    <!-- AUDIO -->
     <audio id="bg-music" loop>
         <source src="h-bday.mp3" type="audio/mpeg">
     </audio>
@@ -466,6 +495,7 @@
         <source src="https://notificationsounds.com/storage/sounds/file-sounds-1235-victory.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- LOGIC -->
     <script>
         // --- CONFIG CHECK ---
         if (typeof CONFIG === 'undefined') { console.error("config.js missing"); alert("Config missing"); }
@@ -475,7 +505,11 @@
         let selectedTheme = 'classic';
         let isMicActive = false;
         let audioContext, microphone, analyser;
-        let currentWishIsPremium = false; // Determined when loading a wish
+
+        // Blow Detection Variables
+        let blowHistory = [];
+        const BLOW_THRESHOLD = 0.3; // RMS Volume Threshold
+        const SUSTAIN_FRAMES = 10; // Must be loud for ~160ms
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -564,10 +598,14 @@
         // --- PREMIUM BLOW FEATURE LOGIC ---
 
         function initCeremony() {
-            // Called when the Wish Page Loads if Premium
             const overlay = document.getElementById('ceremony-overlay');
             const text = document.getElementById('ceremony-text');
             const micUI = document.getElementById('mic-permission-ui');
+            const micMeter = document.getElementById('mic-meter');
+
+            // Reset States
+            micUI.classList.add('hidden');
+            micMeter.classList.add('hidden');
 
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
@@ -591,64 +629,88 @@
                             micUI.classList.remove('hidden');
                             micUI.classList.add('flex');
                         }, 1000);
-                    }, 3000); // 3s for wish
+                    }, 3000);
                 }, 1000);
-            }, 3000); // 3s for closing eyes
+            }, 3000);
         }
 
         async function startMicSequence() {
             const micUI = document.getElementById('mic-permission-ui');
             const text = document.getElementById('ceremony-text');
+            const micMeter = document.getElementById('mic-meter');
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 microphone = audioContext.createMediaStreamSource(stream);
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256;
+                analyser.fftSize = 512;
                 microphone.connect(analyser);
 
                 isMicActive = true;
+                blowHistory = []; // Reset history
 
-                // Hide UI, Show "Blow"
+                // UI Transitions
                 micUI.classList.add('hidden');
                 text.innerHTML = "Now...<br>Blow out the candles!";
                 text.style.opacity = '1';
+                micMeter.classList.remove('hidden');
 
-                // Transition to Cake View
+                // Allow user to read text for 2 seconds before closing overlay
                 setTimeout(() => {
                     document.getElementById('ceremony-overlay').classList.add('opacity-0');
                     setTimeout(() => {
                         document.getElementById('ceremony-overlay').classList.add('hidden');
-                        document.getElementById('tap-instruction').innerHTML = "🌬️ Blow into your mic!";
+                        document.getElementById('tap-instruction').innerHTML = "🌬️ Blow to wish!";
                         detectBlow();
                     }, 1000);
                 }, 2000);
 
             } catch (err) {
                 console.error("Mic denied:", err);
-                skipMic(); // Fallback
+                skipMic();
             }
         }
 
         function skipMic() {
             document.getElementById('ceremony-overlay').classList.add('hidden');
-            // Fallback to tap
+            document.getElementById('tap-instruction').innerHTML = "👇 Tap candle to wish!";
         }
 
+        // --- THE BLOW DETECTION ALGORITHM ---
         function detectBlow() {
             if (!isMicActive) return;
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteFrequencyData(dataArray);
 
-            // Calculate average volume
+            // 1. Calculate RMS (Volume)
             let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-            let average = sum / dataArray.length;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += (dataArray[i] / 255) * (dataArray[i] / 255); // Normalize 0-1
+            }
+            let rms = Math.sqrt(sum / dataArray.length);
 
-            // Threshold for "Blowing" (usually > 40-50 depends on device)
-            if (average > 45) {
-                blowCandle(); // Trigger success
+            // 2. Rolling Average Filter
+            // We keep the last 'SUSTAIN_FRAMES' volumes in an array
+            blowHistory.push(rms);
+            if (blowHistory.length > SUSTAIN_FRAMES) blowHistory.shift();
+
+            // 3. Check Average
+            let avgVolume = blowHistory.reduce((a, b) => a + b, 0) / blowHistory.length;
+
+            // Visual Feedback
+            const flame = document.getElementById('flame');
+            if (flame) {
+                // Flicker effect based on volume
+                let scale = 1 - (avgVolume * 0.5);
+                flame.style.transform = `translateX(-50%) scale(${Math.max(0.5, scale)})`;
+                flame.style.opacity = Math.max(0.5, 1 - avgVolume);
+            }
+
+            // 4. Trigger Condition
+            // Must have enough history (don't trigger on first frame) AND high average volume
+            if (blowHistory.length >= SUSTAIN_FRAMES && avgVolume > BLOW_THRESHOLD) {
+                blowCandle();
             } else {
                 requestAnimationFrame(detectBlow);
             }
@@ -712,9 +774,15 @@
                 // Set Data
                 recipientEl.innerText = `Happy Birthday ${data.recipient_name}!`;
 
+                // MEDIA RENDERER (Image OR Video)
                 let mediaHtml = '';
                 if (data.image_url) {
-                    mediaHtml = `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white/50 shadow-lg transform hover:scale-105 transition duration-500">`;
+                    const isVideo = data.image_url.match(/\.(mp4|webm|mov)$/i);
+                    if (isVideo) {
+                        mediaHtml = `<video src="${data.image_url}" autoplay loop muted playsinline class="w-full max-h-64 rounded-xl mx-auto mb-6 object-cover border-4 border-white/50 shadow-lg transform hover:scale-105 transition duration-500"></video>`;
+                    } else {
+                        mediaHtml = `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white/50 shadow-lg transform hover:scale-105 transition duration-500">`;
+                    }
                 }
 
                 cardInner.innerHTML = `
@@ -730,13 +798,10 @@
                 // Apply Theme Logic
                 applyTheme(data.theme);
 
-                // Premium Logic Check (Simulated for demo - in real app check creator's sub status)
-                // For now, we assume Love/Midnight are "Premium"
+                // Premium Logic Check
                 if (data.theme === 'love' || data.theme === 'midnight') {
-                    currentWishIsPremium = true;
                     initCeremony();
                 } else {
-                    currentWishIsPremium = false;
                     document.getElementById('ceremony-overlay').classList.add('hidden');
                 }
 
@@ -749,7 +814,6 @@
         function applyTheme(theme) {
             const view = document.getElementById('view-wish');
             const bg = document.getElementById('theme-bg-layer');
-            const card = document.getElementById('wish-card-inner');
 
             // Reset
             view.className = "hidden min-h-screen animate-fade-in w-full relative overflow-hidden";
@@ -758,7 +822,6 @@
 
             if (theme === 'love') {
                 view.classList.add('bg-love');
-                // Pulse handled by CSS
             } else if (theme === 'ocean') {
                 view.classList.add('bg-gradient-to-b', 'from-sky-300', 'to-blue-500');
                 bg.innerHTML = '<div class="ocean-wave animate-wave"></div><div class="ocean-wave animate-wave-slow" style="opacity: 0.5; bottom: 10px; animation-direction: reverse;"></div>';
@@ -766,7 +829,7 @@
                 view.classList.add('bg-gradient-to-br', 'from-yellow-300', 'to-orange-500');
                 bg.innerHTML = '<div class="sun-rays animate-spin-slow"></div>';
             } else if (theme === 'midnight') {
-                view.classList.add('bg-midnight', 'theme-midnight');
+                view.classList.add('bg-midnight');
                 bg.innerHTML = '<div class="shooting-star animate-shooting-star" style="top: 20%; left: 20%;"></div><div class="shooting-star animate-shooting-star" style="top: 50%; left: 60%; animation-delay: 4s;"></div>';
                 // Stars
                 for (let i = 0; i < 30; i++) {
@@ -779,7 +842,6 @@
                     bg.appendChild(s);
                 }
             } else {
-                // Classic
                 view.classList.add('bg-gradient-to-br', 'from-purple-500', 'to-pink-500');
             }
         }
@@ -803,14 +865,12 @@
         }
 
         function buyPremium() {
-            // Placeholder for Razorpay
             alert("Razorpay would open here. Simulator: Premium Unlocked!");
             if (currentUser) localStorage.setItem('is_premium_' + currentUser.id, 'true');
             checkPremiumStatus();
             loadDashboard();
         }
 
-        // Confetti
         function startConfetti() {
             const c = document.getElementById('confetti-canvas');
             const ctx = c.getContext('2d');
@@ -832,7 +892,6 @@
             step();
         }
 
-        // Auth & DB (Simplified for brevity)
         async function handleLogin() { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); }
         async function handleLogout() { await supabase.auth.signOut(); navigateTo('/'); }
 
@@ -862,19 +921,33 @@
             if (!currentUser) return navigateTo('/login');
 
             const btn = document.getElementById('submit-btn');
+            const mediaInput = document.getElementById('media-upload');
+            const recipient = document.getElementById('recipient').value;
+            const message = document.getElementById('message').value;
+
+            // Strict Validation
+            if (mediaInput.files[0] && mediaInput.files[0].size > 10 * 1024 * 1024) {
+                return alert("File too large! Max 10MB.");
+            }
+
             btn.disabled = true; btn.innerText = "Creating...";
 
-            // Photo Upload would happen here (Cloudinary)
-            // For now, simple insert
+            // In a real app, this is where Cloudinary upload happens.
+            // Since I cannot configure your backend bucket, I'll assume an image upload function exists or returns null
+            // For now, let's assume it was uploaded and we have a URL.
+            // If it's a video, use a sample video URL for demo purposes if no upload logic exists.
+            let imageUrl = null;
+            // PLACEHOLDER: imageUrl = await uploadToCloudinary(mediaInput.files[0]);
+
             const { data, error } = await supabase.from('wishes').insert([{
-                recipient_name: document.getElementById('recipient').value,
-                message: document.getElementById('message').value,
+                recipient_name: recipient,
+                message: message,
                 theme: selectedTheme,
+                image_url: imageUrl, // Will be null in this demo without actual cloud credentials
                 creator_id: currentUser.id
             }]).select().single();
 
             if (!error) {
-                // Show modal with share link
                 alert("Created! Share URL: " + window.location.origin + "/wish/" + data.id);
                 navigateTo('/dashboard');
             } else {
@@ -884,7 +957,7 @@
         }
 
         window.updateFileName = (input) => {
-            document.getElementById('file-upload-text').innerText = input.files[0] ? input.files[0].name : "Supports JPG/PNG";
+            document.getElementById('file-upload-text').innerText = input.files[0] ? input.files[0].name : "Photo or Video (Max 10MB)";
         }
     </script>
 </body>
