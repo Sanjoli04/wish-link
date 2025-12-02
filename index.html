@@ -5,40 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WishLink - Create Magic Moments</title>
-
     <link rel="icon" type="image/png" href="favicon.png">
 
+    <!-- External SDKs -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Config -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            pink: '#FF0055',
-                            navy: '#002366',
-                            bg: '#F9FAFB',
-                        }
+                        brand: { pink: '#FF0055', navy: '#002366', bg: '#F9FAFB' }
                     },
                     fontFamily: {
                         sans: ['Nunito', 'sans-serif'],
+                        cursive: ['Nunito', 'cursive'],
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.4s ease-out forwards',
-                        'slide-up': 'slideUp 0.5s ease-out forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                     },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        bounceIn: { '0%': { transform: 'scale(0)' }, '70%': { transform: 'scale(1.1)' }, '100%': { transform: 'scale(1)' } }
                     }
                 }
             }
@@ -46,1324 +42,970 @@
     </script>
 
     <style>
-        :root {
-            --color-primary: #FF0055;
-            --color-secondary: #002366;
-            --color-bg: #F9FAFB;
-        }
-
+        /* --- CORE STYLES --- */
         body {
             font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .font-cursive {
-            font-family: 'Nunito', cursive;
             font-weight: 800;
+            font-style: italic;
         }
 
         html {
             scroll-behavior: smooth;
         }
 
-        /* Toast Animation */
-        @keyframes slideDown {
-            from {
-                transform: translate(-50%, -100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
         }
 
-        .toast-enter {
-            animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .toast {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: #002366;
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            min-width: 300px;
         }
 
-        /* Interactive Elements */
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        /* --- ANIMATIONS & FX --- */
         .btn-gift {
             background: #FF0055;
             box-shadow: 0 4px 14px 0 rgba(255, 0, 85, 0.39);
             transition: all 0.2s ease;
         }
 
-        .btn-gift:hover {
+        .btn-gift:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 0, 85, 0.23);
         }
 
-        .btn-gift:active {
+        .btn-gift:active:not(:disabled) {
             transform: translateY(0);
         }
 
         .btn-gift:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-            transform: none;
+            filter: grayscale(1);
         }
 
-        /* Theme Cards */
         .theme-card {
             transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
-        .theme-card.active div:first-child {
-            opacity: 1;
-            transform: scale(1.03);
+        .theme-card.active {
+            border-color: #FF0055;
+            transform: scale(1.02);
             box-shadow: 0 10px 25px -5px rgba(255, 0, 85, 0.25);
-            border: 2px solid #FF0055;
         }
 
         .theme-card.active .check-icon {
             display: flex;
         }
 
-        .theme-card.active .theme-label {
-            color: #002366;
-            font-weight: 800;
+        /* Candle Flame Physics */
+        .flame {
+            transform-origin: center bottom;
+            animation: flicker 3ms ease-in infinite alternate, move 3s infinite linear;
         }
 
-        /* Cake Animations */
         @keyframes flicker {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
 
-            0%,
             100% {
-                transform: translateX(-50%) scale(1);
+                transform: scale(1.1);
                 opacity: 1;
+            }
+        }
+
+        @keyframes move {
+            0% {
+                transform: skewX(2deg);
             }
 
             50% {
-                transform: translateX(-50%) scale(1.1);
-                opacity: 0.9;
+                transform: skewX(-2deg);
+            }
+
+            100% {
+                transform: skewX(2deg);
             }
         }
 
-        .animate-flicker {
-            animation: flicker 0.5s infinite alternate;
-        }
-
-        /* --- PREMIUM THEME STYLES --- */
-
-        /* LOVE THEME */
+        /* Premium Themes */
         .bg-love {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         }
 
-        .heart-bg {
+        .bg-midnight {
+            background: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
+            color: white;
+        }
+
+        .floating-heart {
             position: absolute;
-            bottom: -100px;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.4);
-            transform: rotate(45deg);
-            animation: floatHeart 10s infinite linear;
-            z-index: 1;
-            /* Behind content */
+            animation: floatUp 8s linear infinite;
             pointer-events: none;
+            opacity: 0;
         }
 
-        .heart-bg::before,
-        .heart-bg::after {
-            content: "";
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-        }
-
-        .heart-bg::before {
-            top: -20px;
-            left: 0;
-        }
-
-        .heart-bg::after {
-            left: -20px;
-            top: 0;
-        }
-
-        @keyframes floatHeart {
+        @keyframes floatUp {
             0% {
-                transform: translateY(0) rotate(45deg) scale(0.8);
+                transform: translateY(100vh) scale(0.5);
                 opacity: 0;
             }
 
             20% {
-                opacity: 0.8;
+                opacity: 0.6;
             }
 
             100% {
-                transform: translateY(-100vh) rotate(45deg) scale(1.2);
+                transform: translateY(-20vh) scale(1.2);
                 opacity: 0;
             }
         }
 
-        /* MIDNIGHT THEME */
-        .bg-midnight {
-            background: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .star {
+        .star-twinkle {
             position: absolute;
-            width: 2px;
-            height: 2px;
             background: white;
             border-radius: 50%;
-            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.4);
-            animation: twinkle 3s infinite;
-            pointer-events: none;
+            animation: twinkle var(--duration) infinite;
+            opacity: 0;
         }
 
         @keyframes twinkle {
-            0% {
-                opacity: 0.3;
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.8);
             }
 
             50% {
                 opacity: 1;
                 transform: scale(1.2);
+                box-shadow: 0 0 10px white;
             }
-
-            100% {
-                opacity: 0.3;
-            }
-        }
-
-        .glass-card-midnight {
-            background: rgba(255, 255, 255, 0.05) !important;
-            /* Override white bg */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 0 30px rgba(0, 200, 255, 0.2);
-            color: #fff !important;
-        }
-
-        /* Fix text colors inside midnight card */
-        .glass-card-midnight p,
-        .glass-card-midnight .font-bold {
-            color: white !important;
-        }
-
-        .glass-card-midnight .text-brand-navy {
-            color: #a5b4fc !important;
-            /* Lighter blue for dark mode */
         }
     </style>
-
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="bg-brand-bg text-gray-800 selection:bg-pink-100 selection:text-brand-pink">
+<body
+    class="bg-brand-bg text-gray-800 selection:bg-pink-100 selection:text-brand-pink overflow-x-hidden flex flex-col min-h-screen">
 
+    <!-- LOAD CONFIG -->
     <script src="config.js"></script>
 
+    <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
 
-    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-40 h-16 transition-all" id="navbar">
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 h-16 transition-all">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-            <a href="/" data-link class="flex items-center gap-2 group">
-                <img src="logo.png" alt="WishLink Logo" class="h-8 w-auto group-hover:scale-105 transition">
+            <a href="#home" class="flex items-center gap-2 group">
+                <img src="logo.png" onerror="this.src='https://placehold.co/40'" alt="WishLink"
+                    class="h-8 w-auto group-hover:scale-105 transition">
                 <span class="text-xl font-bold text-brand-navy tracking-tight hidden md:inline">WishLink<span
                         class="text-brand-pink">.app</span></span>
             </a>
-
             <div class="flex items-center gap-3 md:gap-6 text-sm font-semibold">
-                <a href="/create" data-link
+                <!-- Action Button -->
+                <a href="#create"
                     class="px-4 py-2 bg-white border border-brand-pink text-brand-pink rounded-full hover:bg-pink-50 transition shadow-sm text-xs md:text-sm whitespace-nowrap gap-2 flex items-center">
                     <i class="fas fa-wand-magic-sparkles"></i> Gift Wish
                 </a>
 
-                <button onclick="payForCoffee(50)" class="text-brand-navy hover:text-brand-pink transition px-2 text-lg"
-                    title="Buy us a Coffee"><i class="fas fa-coffee"></i></button>
-
-                <button id="nav-login" onclick="navigateTo('/login')"
-                    class="text-brand-navy hover:text-brand-pink transition px-2">Login</button>
-                <button id="nav-dash" onclick="navigateTo('/dashboard')"
-                    class="hidden text-brand-navy hover:text-brand-pink transition flex items-center gap-2">
-                    <i class="fas fa-user-circle text-lg"></i> <span class="hidden md:inline">Dashboard</span>
+                <!-- Coffee Button -->
+                <button onclick="App.Services.buyCoffee(50)"
+                    class="text-brand-navy hover:text-brand-pink transition px-2 text-lg" title="Buy us a Coffee">
+                    <i class="fas fa-coffee"></i>
                 </button>
-                <button id="nav-logout" onclick="handleLogout()"
-                    class="hidden text-red-400 hover:text-red-600 transition px-2"><i
-                        class="fas fa-sign-out-alt"></i></button>
+
+                <!-- Auth State Controlled by JS -->
+                <div id="nav-auth-container" class="flex items-center gap-4">
+                    <!-- Injected by JS -->
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="pt-16 min-h-screen flex flex-col">
+    <!-- MAIN APP CONTENT -->
+    <main class="pt-16 flex-grow flex flex-col relative">
 
-        <div id="view-home" class="block animate-fade-in">
+        <!-- VIEW: HOME -->
+        <div id="view-home" class="view-section hidden">
             <section class="bg-gradient-to-b from-purple-50 via-white to-white pt-24 pb-20 px-4 text-center">
                 <span
                     class="px-4 py-1.5 bg-pink-100 text-brand-pink rounded-full text-[10px] md:text-xs font-bold tracking-wider uppercase mb-6 inline-block shadow-sm animate-slide-up">100%
                     Free Forever</span>
-
                 <h1 class="text-4xl md:text-6xl font-extrabold text-brand-navy mb-6 leading-tight animate-slide-up"
                     style="animation-delay: 0.1s;">
                     Make Their Birthday <br> <span
                         class="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-navy">Unforgettable</span>
                 </h1>
-
                 <p class="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed px-4 animate-slide-up"
                     style="animation-delay: 0.2s;">
                     Create a personalized, interactive birthday website in 30 seconds. Send a link that plays music,
                     blows candles, and delivers your love.
                 </p>
-
                 <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 animate-slide-up"
                     style="animation-delay: 0.3s;">
-                    <button onclick="navigateTo('/create')"
-                        class="btn-gift px-8 py-4 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl">
-                        Gift this Wish 🎁
-                    </button>
-                    <button onclick="navigateTo('/blog')"
-                        class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-bold hover:bg-gray-50 transition active:scale-95 text-lg">
-                        Read Ideas
-                    </button>
+                    <button onclick="App.Router.go('create')"
+                        class="btn-gift px-8 py-4 text-white rounded-full font-bold text-lg shadow-xl">Gift this Wish
+                        🎁</button>
+                    <button onclick="App.Router.go('blog')"
+                        class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-bold hover:bg-gray-50 transition">Read
+                        Ideas</button>
                 </div>
 
-                <div class="mt-20 max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-[6px] border-white transform -rotate-1 hover:rotate-0 transition duration-700 ease-out cursor-pointer group"
-                    onclick="navigateTo('/create')">
+                <!-- Demo Preview -->
+                <div class="mt-20 max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-[6px] border-white transform -rotate-1 hover:rotate-0 transition duration-700 cursor-pointer group"
+                    onclick="App.Router.go('create')">
                     <div class="bg-gray-100 h-10 flex items-center px-4 gap-2 border-b border-gray-200">
                         <div class="w-3 h-3 bg-red-400 rounded-full"></div>
                         <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
                         <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-                        <div class="ml-auto w-32 h-2 bg-gray-200 rounded-full"></div>
                     </div>
                     <div
-                        class="h-64 md:h-96 bg-gray-50 flex flex-col items-center justify-center text-gray-300 relative overflow-hidden">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-0 group-hover:opacity-100 transition duration-500">
-                        </div>
+                        class="h-64 md:h-96 bg-gray-50 flex flex-col items-center justify-center text-gray-300 relative overflow-hidden group-hover:bg-gray-100 transition-colors">
                         <i
-                            class="fas fa-birthday-cake text-6xl opacity-50 mb-3 group-hover:scale-110 transition duration-500 text-brand-pink"></i>
-                        <p class="font-bold opacity-50 group-hover:opacity-100 group-hover:text-brand-navy transition">
-                            Tap to Create Yours</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="py-20 px-4 max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-                <div
-                    class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
-                    <div
-                        class="w-14 h-14 bg-purple-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-magic"></i></div>
-                    <h3 class="font-bold text-xl mb-3 text-brand-navy">Interactive Cake</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">They actually have to blow the candle (tap/click)
-                        to see your message.</p>
-                </div>
-                <div
-                    class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
-                    <div
-                        class="w-14 h-14 bg-pink-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-music"></i></div>
-                    <h3 class="font-bold text-xl mb-3 text-brand-navy">Music & Confetti</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Auto-plays celebration music and showers the screen
-                        with digital confetti.</p>
-                </div>
-                <div
-                    class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
-                    <div
-                        class="w-14 h-14 bg-blue-100 text-brand-navy rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-share-alt"></i></div>
-                    <h3 class="font-bold text-xl mb-3 text-brand-navy">Easy Sharing</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Get a unique link to share on WhatsApp, Instagram,
-                        or Messenger instantly.</p>
-                </div>
-            </section>
-
-            <section class="py-20 bg-white border-t border-gray-100">
-                <div class="max-w-6xl mx-auto px-4">
-                    <h2 class="text-3xl font-extrabold text-center text-brand-navy mb-12">Wall of Love 💖</h2>
-                    <div class="grid md:grid-cols-3 gap-8">
-                        <div class="bg-brand-bg p-8 rounded-2xl relative">
-                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
-                            <p class="text-gray-600 mb-6 italic relative z-10">"My best friend literally cried when she
-                                blew out the candle on her phone. Best digital gift ever!"</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center font-bold text-purple-700">
-                                    S</div>
-                                <div>
-                                    <div class="font-bold text-brand-navy text-sm">Sarah Jenkins</div>
-                                    <div class="text-xs text-gray-400">Created 3 wishes</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-brand-bg p-8 rounded-2xl relative">
-                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
-                            <p class="text-gray-600 mb-6 italic relative z-10">"I forgot my sister's birthday and made
-                                this in the Uber. She loved it more than the actual gift lol."</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center font-bold text-blue-700">
-                                    M</div>
-                                <div>
-                                    <div class="font-bold text-brand-navy text-sm">Mike T.</div>
-                                    <div class="text-xs text-gray-400">Saved by WishLink</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-brand-bg p-8 rounded-2xl relative">
-                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
-                            <p class="text-gray-600 mb-6 italic relative z-10">"The design is so cute and the animations
-                                are buttery smooth. Feels very premium for a free tool."</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 bg-pink-200 rounded-full flex items-center justify-center font-bold text-pink-700">
-                                    A</div>
-                                <div>
-                                    <div class="font-bold text-brand-navy text-sm">Ananya G.</div>
-                                    <div class="text-xs text-gray-400">Super Fan</div>
-                                </div>
-                            </div>
-                        </div>
+                            class="fas fa-birthday-cake text-6xl opacity-50 mb-3 text-brand-pink group-hover:scale-110 transition duration-500"></i>
+                        <p class="font-bold opacity-50 text-brand-navy">Tap to Create Yours</p>
                     </div>
                 </div>
             </section>
         </div>
 
-        <div id="view-login" class="hidden flex items-center justify-center flex-1 px-4 animate-fade-in bg-gray-50">
+        <!-- VIEW: LOGIN -->
+        <div id="view-login"
+            class="view-section hidden flex items-center justify-center flex-1 px-4 bg-gray-50 min-h-[80vh]">
             <div
-                class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-10px_rgba(0,35,102,0.1)] max-w-sm w-full text-center border border-gray-100">
+                class="bg-white p-10 rounded-3xl shadow-xl max-w-sm w-full text-center border border-gray-100 animate-slide-up">
                 <div
                     class="w-16 h-16 bg-pink-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-lg">
-                    <i class="fas fa-heart"></i>
-                </div>
+                    <i class="fas fa-heart"></i></div>
                 <h2 class="text-3xl font-bold mb-2 text-brand-navy">Welcome Back!</h2>
                 <p class="text-gray-500 mb-8 text-sm">Sign in to save your wishes forever.</p>
-
-                <button onclick="handleLogin()"
-                    class="w-full py-3.5 px-4 border border-gray-300 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition group bg-white">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                        class="w-5 h-5 group-hover:scale-110 transition">
-                    <span class="font-bold text-gray-700">Continue with Google</span>
+                <button onclick="App.Services.login()"
+                    class="w-full py-3.5 px-4 border border-gray-300 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition bg-white text-gray-700 font-bold">
+                    <i class="fab fa-google text-red-500"></i> Continue with Google
                 </button>
-                <p class="text-[10px] text-gray-400 mt-6">By continuing, you agree to our Terms & Privacy Policy.</p>
+                <p class="text-[10px] text-gray-400 mt-6">By continuing, you agree to our Terms.</p>
             </div>
         </div>
 
-        <div id="view-dashboard" class="hidden max-w-4xl mx-auto px-4 py-10 w-full animate-fade-in">
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="view-section hidden max-w-4xl mx-auto px-4 py-10 w-full">
             <div class="flex justify-between items-end mb-8">
                 <div>
                     <h2 class="text-3xl font-bold text-brand-navy">My Wishes</h2>
                     <p class="text-gray-500 text-sm mt-1">Manage the love you've shared</p>
                 </div>
-                <a href="/create" data-link
-                    class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition transform hover:-translate-y-0.5">
-                    <i class="fas fa-plus"></i> New Wish
-                </a>
+                <a href="#create"
+                    class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition"><i
+                        class="fas fa-plus"></i> New Wish</a>
             </div>
 
+            <!-- Premium Banner -->
             <div id="premium-banner"
-                class="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg transform transition hover:scale-[1.01]">
+                class="hidden bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
                 <div>
                     <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-crown text-yellow-100"></i>
                         Go Premium</h3>
-                    <p class="text-white/90 text-sm mt-1">Remove ads & unlock premium themes for just $1.</p>
+                    <p class="text-white/90 text-sm mt-1">Unlock premium themes & remove ads for $1.</p>
                 </div>
-                <button onclick="buyPremium()"
+                <button onclick="App.Services.buyPremium()"
                     class="bg-white text-orange-500 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-50 shadow-sm transition">Upgrade</button>
             </div>
 
             <div id="my-wishes-list" class="grid gap-4">
-                </div>
+                <!-- Injected via JS -->
+            </div>
         </div>
 
-        <div id="view-create" class="hidden max-w-2xl mx-auto px-4 py-10 w-full animate-fade-in">
-            <div class="bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100">
+        <!-- VIEW: CREATE -->
+        <div id="view-create" class="view-section hidden max-w-2xl mx-auto px-4 py-10 w-full">
+            <div class="bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100 animate-slide-up">
                 <h2 class="text-3xl font-bold text-brand-navy mb-8 text-center">Create a New Wish ✨</h2>
-
-                <form id="create-form" class="space-y-8">
+                <form id="create-form" class="space-y-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1 ml-1">Who is it for?</label>
                         <input type="text" id="recipient" required placeholder="e.g., Sarah"
-                            class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-pink/20 focus:border-brand-pink outline-none transition font-semibold text-gray-700 placeholder-gray-300">
+                            class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-pink focus:border-transparent outline-none transition font-semibold">
                     </div>
-
-                    <div class="mb-6">
+                    <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1 ml-1">Your Message</label>
-                        <textarea id="message" required rows="4" placeholder="Write something sweet and emotional..."
-                            class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-pink/20 focus:border-brand-pink outline-none transition text-gray-700 placeholder-gray-300"></textarea>
+                        <textarea id="message" required rows="4" placeholder="Write something sweet..."
+                            class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-pink outline-none transition"></textarea>
                     </div>
 
-                    <div class="mb-6">
+                    <!-- Theme Selector -->
+                    <div>
                         <label class="block text-sm font-bold text-gray-700 mb-4 ml-1">Choose a Theme</label>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="theme-card active cursor-pointer group relative" data-theme="classic">
-                                <div
-                                    class="h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
-                                </div>
-                                <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
-                                    <div
-                                        class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
-                                </div>
-                                <div
-                                    class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
-                                    Classic</div>
-                            </div>
-                            <div class="theme-card cursor-pointer group relative" data-theme="ocean">
-                                <div
-                                    class="h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
-                                </div>
-                                <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
-                                    <div
-                                        class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
-                                </div>
-                                <div
-                                    class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
-                                    Ocean</div>
-                            </div>
-                            <div class="theme-card cursor-pointer group relative" data-theme="sunshine">
-                                <div
-                                    class="h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
-                                </div>
-                                <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
-                                    <div
-                                        class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
-                                </div>
-                                <div
-                                    class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
-                                    Sunshine</div>
-                            </div>
-
-                            <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl"
-                                data-theme="midnight">
-                                <div
-                                    class="premium-lock absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[2px]">
-                                    <div
-                                        class="bg-white/20 p-3 rounded-full border border-white/30 text-white shadow-lg">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                </div>
-                                <div
-                                    class="h-24 bg-gradient-to-br from-slate-900 to-slate-700 opacity-80 group-hover:opacity-100 transition">
-                                </div>
-                                <div class="check-icon absolute inset-0 flex items-center justify-center hidden z-10">
-                                    <div
-                                        class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
-                                </div>
-                                <div class="theme-label text-center text-xs mt-2 font-bold text-gray-500">Midnight 🌙
-                                </div>
-                            </div>
-
-                            <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl"
-                                data-theme="love">
-                                <div
-                                    class="premium-lock absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[2px]">
-                                    <div
-                                        class="bg-white/20 p-3 rounded-full border border-white/30 text-white shadow-lg">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                </div>
-                                <div
-                                    class="h-24 bg-gradient-to-br from-red-500 to-rose-600 opacity-80 group-hover:opacity-100 transition">
-                                </div>
-                                <div class="check-icon absolute inset-0 flex items-center justify-center hidden z-10">
-                                    <div
-                                        class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
-                                </div>
-                                <div class="theme-label text-center text-xs mt-2 font-bold text-gray-500">Love ❤️</div>
-                            </div>
+                        <div class="grid grid-cols-3 gap-4" id="theme-selector">
+                            <!-- Themes injected by JS to reduce HTML bloat -->
                         </div>
                     </div>
 
+                    <!-- Image Upload -->
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Add a Photo (Optional)</label>
-                        <div class="relative group">
-                            <input type="file" id="image-upload" accept="image/*" onchange="updateFileName(this)"
+                        <div class="relative group cursor-pointer">
+                            <input type="file" id="image-upload" accept="image/*"
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            <div
-                                class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center group-hover:border-brand-pink group-hover:bg-pink-50 transition-all duration-300">
+                            <div id="upload-preview"
+                                class="w-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center group-hover:border-brand-pink group-hover:bg-pink-50 transition-all">
                                 <div
-                                    class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-white text-gray-400 group-hover:text-brand-pink transition-colors">
-                                    <i class="fas fa-camera text-xl"></i>
-                                </div>
-                                <p id="file-upload-text"
-                                    class="text-sm text-gray-400 group-hover:text-brand-navy font-medium transition-colors">
-                                    Add a sweet memory...</p>
+                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
+                                    <i class="fas fa-camera text-xl"></i></div>
+                                <p id="file-upload-text" class="text-sm text-gray-500 font-medium">Click to upload</p>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2 ml-1">Free version supports 1 photo.</p>
                     </div>
 
                     <button type="submit" id="submit-btn"
-                        class="w-full py-4 btn-gift text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 mt-8">
-                        Gift this Wish 🎁
-                    </button>
+                        class="w-full py-4 btn-gift text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 mt-4">Gift
+                        this Wish 🎁</button>
                 </form>
             </div>
         </div>
 
-        <div id="view-wish" class="hidden min-h-screen bg-gray-900 animate-fade-in w-full">
-            <div id="wish-content"></div>
-
-            <a href="/" data-link
+        <!-- VIEW: WISH (PUBLIC) -->
+        <div id="view-wish" class="view-section hidden min-h-screen bg-gray-900 w-full relative overflow-hidden">
+            <div id="wish-content"
+                class="relative z-10 w-full h-full min-h-screen flex flex-col items-center justify-center">
+                <!-- Dynamic Content -->
+            </div>
+            <!-- Canvas for Confetti -->
+            <canvas id="confetti-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+            <!-- Watermark -->
+            <a href="#home"
                 class="fixed bottom-4 right-4 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white text-xs font-bold hover:bg-white/40 transition z-50 flex items-center gap-2">
                 <span>Made with</span> <span class="font-cursive text-sm">WishLink</span>
             </a>
         </div>
 
-        <div id="view-blog" class="hidden max-w-4xl mx-auto px-4 py-10 w-full animate-fade-in">
+        <!-- VIEW: BLOG (Placeholder) -->
+        <div id="view-blog" class="view-section hidden max-w-4xl mx-auto px-4 py-10">
             <h2 class="text-3xl font-bold text-brand-navy mb-8">Birthday Ideas & Tips 💡</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <article
-                    class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition duration-300 group cursor-pointer">
-                    <div
-                        class="h-48 bg-purple-50 flex items-center justify-center text-brand-pink text-6xl group-hover:scale-110 transition duration-500">
-                        🎂</div>
-                    <div class="p-8">
-                        <h3 class="font-bold text-xl mb-3 text-brand-navy group-hover:text-brand-pink transition">10
-                            Best Messages for Best Friends</h3>
-                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">Struggling to find the right words? Here
-                            are the funniest and sweetest birthday wishes to steal.</p>
-                        <span class="text-brand-pink font-bold text-sm">Read Article -></span>
-                    </div>
-                </article>
-                <article
-                    class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition duration-300 group cursor-pointer">
-                    <div
-                        class="h-48 bg-pink-50 flex items-center justify-center text-brand-pink text-6xl group-hover:scale-110 transition duration-500">
-                        🎁</div>
-                    <div class="p-8">
-                        <h3 class="font-bold text-xl mb-3 text-brand-navy group-hover:text-brand-pink transition">Last
-                            Minute Digital Gift Ideas</h3>
-                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">Forgot a gift? Don't worry. Create a
-                            WishLink and pair it with these instant digital vouchers.</p>
-                        <span class="text-brand-pink font-bold text-sm">Read Article -></span>
-                    </div>
-                </article>
-            </div>
+            <p class="text-gray-500">Coming soon...</p>
         </div>
-
-        <div id="view-admin" class="hidden max-w-6xl mx-auto px-4 py-10 w-full animate-fade-in">
-            <h2 class="text-2xl font-bold mb-4 text-brand-navy">Admin Dashboard</h2>
-            <div class="bg-white p-6 rounded-xl shadow">
-                <div id="admin-stats" class="text-xl font-bold">Loading...</div>
-            </div>
-        </div>
-
     </main>
 
-    <footer class="bg-gray-900 text-gray-400 py-10 text-center mt-auto border-t border-gray-800">
+    <!-- FOOTER RESTORED -->
+    <footer class="bg-gray-900 text-gray-400 py-10 text-center border-t border-gray-800 z-10 relative">
         <div class="flex items-center justify-center gap-2 mb-6">
-            <img src="logo.png" alt="Logo" class="h-6 w-auto brightness-0 invert">
+            <img src="logo.png" onerror="this.src='https://placehold.co/20'" alt="Logo"
+                class="h-6 w-auto brightness-0 invert">
             <span class="font-bold text-white tracking-wide">WishLink</span>
         </div>
 
         <div class="flex justify-center gap-6 text-sm font-medium mb-6">
-            <a href="#" class="hover:text-white transition text-gray-400 hover:scale-105" onclick="payForCoffee(50)">Buy
-                us a Coffee ☕</a>
+            <button class="hover:text-white transition text-gray-400 hover:scale-105"
+                onclick="App.Services.buyCoffee(50)">Buy us a Coffee ☕</button>
             <a href="#" class="hover:text-white transition text-gray-400 hover:scale-105">Privacy Policy</a>
             <a href="#" class="hover:text-white transition text-gray-400 hover:scale-105">Terms of Service</a>
         </div>
         <p class="text-xs text-gray-600">&copy; 2025 WishLink. Crafted with emotions.</p>
     </footer>
 
-    <audio id="bg-music" loop>
+    <!-- AUDIO ELEMENTS -->
+    <audio id="bg-music" loop preload="auto">
         <source src="h-bday.mp3" type="audio/mpeg">
     </audio>
-    <audio id="cheer-audio">
+    <audio id="cheer-audio" preload="auto">
         <source src="https://notificationsounds.com/storage/sounds/file-sounds-1235-victory.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- APP LOGIC -->
     <script>
-        // --- 1. SUPABASE INIT & CHECK ---
-        let supabase;
+        // --- APP NAMESPACE ---
+        const App = {
+            State: {
+                user: null,
+                isPremium: false,
+                currentTheme: 'classic',
+                audioContext: null,
+                microphone: null,
+                analyser: null,
+                isBlowing: false
+            },
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof CONFIG === 'undefined') {
-                showToast('❌ config.js missing! Cannot start app.', 'error');
-                console.error("CRITICAL: config.js file not found.");
-                return;
-            }
+            // --- UI UTILS & TOASTS ---
+            UI: {
+                toast(msg, type = 'success') {
+                    const container = document.getElementById('toast-container');
+                    const el = document.createElement('div');
+                    el.className = `toast ${type}`;
+                    const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
+                    el.innerHTML = `<i class="fas ${icon} text-lg"></i><span>${msg}</span>`;
+                    container.appendChild(el);
 
-            try {
-                supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+                    // Animate In
+                    requestAnimationFrame(() => el.classList.add('show'));
 
-                supabase.auth.onAuthStateChange((event, session) => {
-                    currentUser = session?.user || null;
-                    updateNavbar();
-                    
-                    // Logic: If on login page and logged in, redirect
-                    if (currentUser && window.location.pathname === '/login') {
-                        const returnTo = sessionStorage.getItem('return_to');
-                        if (returnTo) {
+                    // Remove
+                    setTimeout(() => {
+                        el.classList.remove('show');
+                        setTimeout(() => el.remove(), 400);
+                    }, 3000);
+                },
+
+                setLoading(btn, isLoading, text = 'Loading...') {
+                    if (isLoading) {
+                        btn.dataset.originalText = btn.innerHTML;
+                        btn.disabled = true;
+                        btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${text}`;
+                    } else {
+                        btn.disabled = false;
+                        btn.innerHTML = btn.dataset.originalText || 'Submit';
+                    }
+                },
+
+                renderThemes() {
+                    const themes = [
+                        { id: 'classic', name: 'Classic', color: 'from-purple-500 to-pink-500', premium: false },
+                        { id: 'ocean', name: 'Ocean', color: 'from-blue-400 to-indigo-600', premium: false },
+                        { id: 'sunshine', name: 'Sunshine', color: 'from-yellow-400 to-orange-500', premium: false },
+                        { id: 'midnight', name: 'Midnight 🌙', color: 'from-slate-900 to-slate-700', premium: true },
+                        { id: 'love', name: 'Love ❤️', color: 'from-red-500 to-rose-600', premium: true }
+                    ];
+
+                    const container = document.getElementById('theme-selector');
+                    if (!container) return;
+
+                    container.innerHTML = themes.map(t => `
+                        <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl h-24 ${App.State.currentTheme === t.id ? 'active' : ''}" 
+                             onclick="App.Controllers.selectTheme('${t.id}', ${t.premium})">
+                            <div class="absolute inset-0 bg-gradient-to-br ${t.color} opacity-80 group-hover:opacity-100 transition"></div>
+                            ${t.premium ? `<div class="premium-lock absolute inset-0 bg-black/40 z-10 flex items-center justify-center ${App.State.isPremium ? 'hidden' : ''}"><i class="fas fa-lock text-white"></i></div>` : ''}
+                            <div class="check-icon absolute inset-0 flex items-center justify-center ${App.State.currentTheme === t.id ? 'flex' : 'hidden'} z-20">
+                                <div class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in"><i class="fas fa-check"></i></div>
+                            </div>
+                            <div class="absolute bottom-2 w-full text-center text-white text-xs font-bold shadow-sm z-10">${t.name}</div>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            // --- SERVICES (Supabase, Uploads) ---
+            Services: {
+                supabase: null,
+
+                init() {
+                    if (typeof CONFIG === 'undefined') {
+                        App.UI.toast('Config missing!', 'error');
+                        return;
+                    }
+                    this.supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+                    // Auth Listener
+                    this.supabase.auth.onAuthStateChange((event, session) => {
+                        App.State.user = session?.user || null;
+                        App.Controllers.updateNav();
+                        App.Services.checkPremium();
+
+                        // Handle Login Redirect
+                        if (App.State.user && window.location.hash === '#login') {
+                            const returnTo = sessionStorage.getItem('return_to') || 'dashboard';
                             sessionStorage.removeItem('return_to');
-                            navigateTo('/' + returnTo);
-                        } else {
-                            navigateTo('/dashboard');
+                            App.Router.go(returnTo);
                         }
+                    });
+                },
+
+                async login() {
+                    const { error } = await this.supabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: { redirectTo: window.location.origin }
+                    });
+                    if (error) App.UI.toast(error.message, 'error');
+                },
+
+                async logout() {
+                    await this.supabase.auth.signOut();
+                    App.UI.toast('Logged out successfully');
+                    App.Router.go('home');
+                },
+
+                async uploadImage(file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CONFIG.CLOUDINARY_PRESET);
+
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+                    if (!res.ok) throw new Error('Upload failed');
+                    const data = await res.json();
+                    return data.secure_url;
+                },
+
+                checkPremium() {
+                    if (!App.State.user) return;
+                    const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
+                    App.State.isPremium = isPrem;
+                    // Update UI
+                    if (isPrem) {
+                        document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
+                        const banner = document.getElementById('premium-banner');
+                        if (banner) banner.classList.add('hidden');
                     }
-                });
+                },
 
-                supabase.auth.getSession().then(({ data: { session } }) => {
-                    currentUser = session?.user || null;
-                    updateNavbar();
-                });
+                buyPremium() {
+                    this.triggerPayment(4900, "WishLink Premium", "Unlock all themes", () => {
+                        App.UI.toast("Payment Successful! Premium Unlocked 👑");
+                        localStorage.setItem(`premium_${App.State.user.id}`, 'true');
+                        App.Services.checkPremium();
+                    });
+                },
 
-            } catch (e) {
-                console.error("Supabase Init Error:", e);
-                showToast("Failed to initialize backend", "error");
-            }
+                buyCoffee(amount) {
+                    this.triggerPayment(amount * 100, "Buy us a Coffee", "Thanks for your support! ☕", () => {
+                        App.UI.toast("Thank you for the coffee! ❤️");
+                    });
+                },
 
-            initThemeSelection();
-            const form = document.getElementById('create-form');
-            if (form) form.addEventListener('submit', handleFormSubmit);
+                triggerPayment(amount, name, desc, successCallback) {
+                    if (typeof Razorpay === 'undefined' || !CONFIG.RAZORPAY_KEY) {
+                        alert("Payment Config Missing. Simulating success for demo.");
+                        successCallback();
+                        return;
+                    }
+                    const options = {
+                        key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR",
+                        name: name, description: desc,
+                        handler: function (response) { successCallback(); }
+                    };
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                }
+            },
 
-            // INITIALIZE ROUTER
-            router();
-
-            // Setup background music interaction
-            document.body.addEventListener('click', () => {
-                const bgMusic = document.getElementById('bg-music');
-                // Only play if on Wish Page
-                if (window.location.pathname.startsWith('/wish') && bgMusic && bgMusic.paused) {
+            // --- AUDIO & MIC ENGINE (The Upgrade) ---
+            Audio: {
+                startMusic() {
+                    const bgMusic = document.getElementById('bg-music');
                     bgMusic.volume = 0.4;
-                    bgMusic.play().catch(() => { });
-                }
-            });
-        });
+                    bgMusic.play().catch(() => console.log('Autoplay blocked'));
+                },
 
-        // --- GLOBAL STATE ---
-        let currentUser = null;
-        let selectedTheme = 'classic';
-        let isPremium = false;
+                stopAll() {
+                    const bg = document.getElementById('bg-music');
+                    const cheer = document.getElementById('cheer-audio');
+                    bg.pause(); bg.currentTime = 0;
+                    cheer.pause(); cheer.currentTime = 0;
+                    this.stopMic();
+                },
 
-        // --- NEW ROUTER LOGIC ---
-        
-        // 1. Handle Navigation for links
-        document.addEventListener("click", e => {
-            const link = e.target.closest("[data-link]");
-            if (link) {
-                e.preventDefault();
-                navigateTo(link.getAttribute("href"));
-            }
-        });
+                async initMic(onBlow) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        App.State.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        App.State.analyser = App.State.audioContext.createAnalyser();
+                        App.State.microphone = App.State.audioContext.createMediaStreamSource(stream);
+                        App.State.microphone.connect(App.State.analyser);
+                        App.State.analyser.fftSize = 256;
 
-        // 2. Handle Back/Forward buttons
-        window.addEventListener("popstate", () => {
-            router();
-        });
+                        const bufferLength = App.State.analyser.frequencyBinCount;
+                        const dataArray = new Uint8Array(bufferLength);
 
-        // 3. The navigateTo function you requested
-        const navigateTo = (url) => {
-            history.pushState(null, null, url);
-            router();
-        };
+                        const detectBlow = () => {
+                            if (!App.State.audioContext) return;
+                            App.State.analyser.getByteFrequencyData(dataArray);
 
-        const router = async () => {
-            stopAllAudio();
+                            // Blow detection logic: High energy in low frequencies
+                            let sum = 0;
+                            for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                            const average = sum / bufferLength;
 
-            const path = window.location.pathname;
-            
-            // Define routes mapping
-            const routes = {
-                "/": "view-home",
-                "/create": "view-create",
-                "/login": "view-login",
-                "/dashboard": "view-dashboard",
-                "/blog": "view-blog",
-                "/admin": "view-admin"
-            };
-
-            let viewId = routes[path];
-            let param = null;
-
-            // Handle Wish Dynamic Route
-            if (path.startsWith("/wish/")) {
-                viewId = "view-wish";
-                param = path.split("/")[2];
-            }
-
-            // Default to home if route not found
-            if (!viewId) {
-                viewId = "view-home";
-            }
-
-            // Hide all views
-            document.querySelectorAll('[id^="view-"]').forEach(el => {
-                el.classList.add('hidden');
-                el.classList.remove('animate-fade-in');
-            });
-
-            // Show active view
-            const activeEl = document.getElementById(viewId);
-            if (activeEl) {
-                activeEl.classList.remove('hidden');
-                void activeEl.offsetWidth; // Trigger reflow
-                activeEl.classList.add('animate-fade-in');
-                window.scrollTo(0, 0);
-            }
-
-            checkPremiumStatus();
-            updateNavbar();
-
-            if (viewId === 'view-wish' && param) loadWish(param);
-            else if (viewId === 'view-dashboard') loadDashboard();
-            else if (viewId === 'view-admin') loadAdmin();
-        };
-
-        function updateNavbar() {
-            const navLogin = document.getElementById('nav-login');
-            const navDash = document.getElementById('nav-dash');
-            const navLogout = document.getElementById('nav-logout');
-            const path = window.location.pathname;
-
-            if (currentUser) {
-                navLogin.classList.add('hidden');
-                navDash.classList.remove('hidden');
-                navLogout.classList.remove('hidden');
-            } else {
-                if (path === '/login') navLogin.classList.add('hidden');
-                else navLogin.classList.remove('hidden');
-
-                navDash.classList.add('hidden');
-                navLogout.classList.add('hidden');
-            }
-        }
-
-        // --- HELPER: STOP AUDIO ---
-        function stopAllAudio() {
-            const bgMusic = document.getElementById('bg-music');
-            const cheerAudio = document.getElementById('cheer-audio');
-
-            if (bgMusic) {
-                bgMusic.pause();
-                bgMusic.currentTime = 0;
-            }
-            if (cheerAudio) {
-                cheerAudio.pause();
-                cheerAudio.currentTime = 0;
-            }
-        }
-
-        // --- PAYMENT LOGIC ---
-        function handlePayment(amount, description) {
-            if (!CONFIG.RAZORPAY_KEY) {
-                alert("Payment system not configured!");
-                return;
-            }
-
-            const options = {
-                "key": CONFIG.RAZORPAY_KEY,
-                "amount": amount * 100,
-                "currency": "INR",
-                "name": "WishLink",
-                "description": description,
-                "image": "logo.png",
-                "handler": function (response) {
-                    console.log("Payment ID: ", response.razorpay_payment_id);
-                    showToast("Payment Successful! Thank you! ❤️");
-                    if (description.includes("Premium")) {
-                        unlockThemes();
-                        isPremium = true;
-                        localStorage.setItem('is_premium_' + (currentUser?.id || 'guest'), 'true');
-                        loadDashboard(); 
+                            if (average > 50) { // Threshold
+                                onBlow();
+                                this.stopMic();
+                            } else {
+                                requestAnimationFrame(detectBlow);
+                            }
+                        };
+                        detectBlow();
+                        App.UI.toast("Microphone Active! Blow on the screen 🎂");
+                    } catch (err) {
+                        console.error("Mic error", err);
+                        App.UI.toast("Microphone access denied. Tap the candle instead.", "error");
                     }
                 },
-                "prefill": {
-                    "name": currentUser ? currentUser.email : "Guest User",
-                    "email": currentUser ? currentUser.email : "",
-                    "contact": ""
-                },
-                "theme": {
-                    "color": "#FF0055"
+
+                stopMic() {
+                    if (App.State.audioContext) {
+                        App.State.audioContext.close();
+                        App.State.audioContext = null;
+                    }
                 }
-            };
+            },
 
-            const rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response) {
-                alert("Payment Failed: " + response.error.description);
-            });
+            // --- ROUTER (The Fix) ---
+            Router: {
+                init() {
+                    window.addEventListener('hashchange', this.handleRoute.bind(this));
+                    window.addEventListener('load', this.handleRoute.bind(this)); // Fix refresh issue
+                },
 
-            rzp1.open();
-        }
+                go(route) { window.location.hash = `#${route}`; },
 
-        function payForCoffee(amount) {
-            handlePayment(amount, "Buy us a Coffee");
-        }
+                handleRoute() {
+                    App.Audio.stopAll(); // Cleanup audio on nav
 
-        function buyPremium() {
-            handlePayment(49, "Premium Upgrade");
-        }
+                    const hash = window.location.hash.slice(1) || 'home';
+                    const [route, param] = hash.split('/');
 
-        // --- CHECK PREMIUM STATUS ---
-        function checkPremiumStatus() {
-            if (!currentUser) return;
-            const status = localStorage.getItem('is_premium_' + currentUser.id);
-            if (status === 'true') {
-                isPremium = true;
-                unlockThemes();
-            }
-        }
+                    // Hide all views
+                    document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
 
-        function unlockThemes() {
-            document.querySelectorAll('.premium-lock').forEach(el => {
-                el.classList.add('hidden');
-            });
-            const banner = document.getElementById('premium-banner');
-            if (banner) banner.style.display = 'none';
-        }
+                    // Show active view
+                    const activeView = document.getElementById(`view-${route}`);
+                    if (activeView) {
+                        activeView.classList.remove('hidden');
+                        activeView.classList.add('animate-fade-in');
+                        window.scrollTo(0, 0);
+                    }
 
-        // --- TOAST SYSTEM ---
-        window.showToast = (message, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
+                    // Route Logic
+                    if (route === 'dashboard') App.Controllers.loadDashboard();
+                    if (route === 'create') App.UI.renderThemes();
+                    if (route === 'wish' && param) App.Controllers.loadWish(param);
+                    if (route === 'login' && App.State.user) this.go('dashboard');
+                }
+            },
 
-            const colors = type === 'error' ? 'bg-red-500' : 'bg-brand-navy';
-            const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
+            // --- CONTROLLERS (Business Logic) ---
+            Controllers: {
+                updateNav() {
+                    const container = document.getElementById('nav-auth-container');
+                    if (App.State.user) {
+                        container.innerHTML = `
+                            <button onclick="App.Router.go('dashboard')" class="text-brand-navy hover:text-brand-pink transition font-bold"><i class="fas fa-user-circle"></i> Dashboard</button>
+                            <button onclick="App.Services.logout()" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-sign-out-alt"></i></button>
+                        `;
+                    } else {
+                        container.innerHTML = `<button onclick="App.Router.go('login')" class="text-brand-navy hover:text-brand-pink transition font-bold">Login</button>`;
+                    }
+                },
 
-            toast.className = `toast-enter fixed top-6 left-1/2 transform -translate-x-1/2 z-[60] flex items-center gap-3 px-6 py-3 rounded-full shadow-2xl ${colors} text-white min-w-[300px] justify-center backdrop-blur-md bg-opacity-95`;
-            toast.innerHTML = `<i class="fas ${icon}"></i><span class="font-semibold text-sm">${message}</span>`;
+                selectTheme(id, isPremium) {
+                    if (isPremium && !App.State.isPremium) {
+                        App.UI.toast("This theme requires Premium upgrade 👑", "error");
+                        return;
+                    }
+                    App.State.currentTheme = id;
+                    App.UI.renderThemes();
+                },
 
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, -100%)';
-                setTimeout(() => toast.remove(), 500);
-            }, 3000);
-        };
-
-        // --- AUTH (GOOGLE OAUTH) ---
-        window.handleLogin = async () => {
-            if (!supabase) return showToast("Backend not ready", "error");
-            showToast("Redirecting to Google... 🚀");
-            try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: { redirectTo: window.location.origin }
-                });
-                if (error) throw error;
-            } catch (error) {
-                console.error(error);
-                showToast(error.message, "error");
-            }
-        };
-
-        window.handleLogout = async () => {
-            if (supabase) await supabase.auth.signOut();
-            showToast("See you soon! 👋");
-            navigateTo('/');
-        };
-
-        // --- THEME LOGIC ---
-        function initThemeSelection() {
-            const cards = document.querySelectorAll('.theme-card');
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    if (card.querySelector('.premium-lock') && !card.querySelector('.premium-lock').classList.contains('hidden')) {
-                        showToast("This theme is locked! Upgrade to Premium 👑", "error");
+                async handleCreate(e) {
+                    e.preventDefault();
+                    if (!App.State.user) {
+                        App.UI.toast("Please login to create a wish");
+                        sessionStorage.setItem('return_to', 'create');
+                        App.Router.go('login');
                         return;
                     }
 
-                    cards.forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    selectedTheme = card.dataset.theme;
-                });
-            });
-        }
+                    const btn = document.getElementById('submit-btn');
+                    App.UI.setLoading(btn, true, "Wrapping Gift...");
 
-        function resetThemeSelection() {
-            const cards = document.querySelectorAll('.theme-card');
-            cards.forEach(c => c.classList.remove('active'));
-            document.querySelector('.theme-card[data-theme="classic"]').classList.add('active');
-            selectedTheme = 'classic';
-        }
+                    try {
+                        const fileInput = document.getElementById('image-upload');
+                        let imgUrl = null;
 
-        // --- IMAGE UPLOAD ---
-        async function uploadImage(file) {
-            if (!CONFIG.CLOUDINARY_CLOUD_NAME || !CONFIG.CLOUDINARY_PRESET) {
-                throw new Error("Cloudinary Config Missing");
-            }
-            const url = `https://api.cloudinary.com/v1_1/${CONFIG.CLOUDINARY_CLOUD_NAME}/image/upload`;
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CONFIG.CLOUDINARY_PRESET);
-            const res = await fetch(url, { method: 'POST', body: formData });
-            if (!res.ok) throw new Error('Image upload failed');
-            const data = await res.json();
-            return data.secure_url;
-        }
+                        if (fileInput.files.length) {
+                            App.UI.setLoading(btn, true, "Uploading Photo...");
+                            imgUrl = await App.Services.uploadImage(fileInput.files[0]);
+                        }
 
-        window.updateFileName = (input) => {
-            const fileName = input.files[0]?.name;
-            const textEl = document.getElementById('file-upload-text');
-            if (fileName) {
-                textEl.innerText = fileName;
-                textEl.className = 'text-sm text-brand-navy font-bold';
-            } else {
-                textEl.innerText = 'Add a sweet memory...';
-                textEl.className = 'text-sm text-gray-400 group-hover:text-brand-navy font-medium transition-colors';
-            }
-        };
+                        App.UI.setLoading(btn, true, "Finalizing...");
 
-        // --- SUBMIT WISH ---
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            if (!currentUser) {
-                showToast("Please sign in to gift this wish ✨");
-                sessionStorage.setItem('return_to', 'create');
-                setTimeout(() => navigateTo('/login'), 1200);
-                return;
-            }
+                        const { data, error } = await App.Services.supabase
+                            .from('wishes')
+                            .insert([{
+                                recipient_name: document.getElementById('recipient').value,
+                                message: document.getElementById('message').value,
+                                theme: App.State.currentTheme,
+                                image_url: imgUrl,
+                                creator_id: App.State.user.id
+                            }])
+                            .select()
+                            .single();
 
-            const btn = document.getElementById('submit-btn');
-            const originalText = btn.innerHTML;
-            const recipient = document.getElementById('recipient').value.trim();
-            const message = document.getElementById('message').value.trim();
-            const fileInput = document.getElementById('image-upload');
+                        if (error) throw error;
 
-            if (!recipient || !message) return showToast("Please fill in the details!", "error");
+                        // Show Success Modal
+                        App.Controllers.showShareModal(data.id);
+                        document.getElementById('create-form').reset();
+                        App.State.currentTheme = 'classic';
+                        App.UI.renderThemes();
 
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating Magic...';
-            btn.disabled = true;
+                    } catch (err) {
+                        App.UI.toast(err.message || "Something went wrong", "error");
+                    } finally {
+                        App.UI.setLoading(btn, false);
+                    }
+                },
 
-            try {
-                let imageUrl = null;
-                if (fileInput.files.length > 0) {
-                    btn.innerHTML = '<i class="fas fa-cloud-upload-alt fa-bounce"></i> Uploading Photo...';
-                    imageUrl = await uploadImage(fileInput.files[0]);
-                }
-
-                btn.innerHTML = '<i class="fas fa-pen-fancy fa-bounce"></i> Saving Wish...';
-
-                const { data, error } = await supabase
-                    .from('wishes')
-                    .insert([{
-                        recipient_name: recipient,
-                        message: message,
-                        theme: selectedTheme,
-                        image_url: imageUrl,
-                        creator_id: currentUser.id
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                showShareModal(data.id);
-                e.target.reset();
-                resetThemeSelection();
-                document.getElementById('file-upload-text').innerText = 'Add a sweet memory...';
-
-            } catch (err) {
-                console.error(err);
-                showToast(err.message, "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // --- VIEW WISH ---
-        async function loadWish(id) {
-            const container = document.getElementById('wish-content');
-            container.innerHTML = '<div class="flex justify-center h-screen items-center gap-3"><i class="fas fa-spinner fa-spin text-4xl text-white"></i><span class="text-white font-medium">Loading Surprise...</span></div>';
-
-            try {
-                const { data, error } = await supabase.from('wishes').select('*').eq('id', id).single();
-                if (error || !data) {
-                    container.innerHTML = '<div class="flex h-screen items-center justify-center"><div class="text-center text-white text-xl bg-white/10 p-8 rounded-xl backdrop-blur-md">Wish not found! Maybe it expired? 🎂</div></div>';
-                } else {
-                    renderWishTemplate(data);
-                }
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<div class="text-center text-white pt-20">Error loading wish.</div>';
-            }
-        }
-
-        function renderWishTemplate(data) {
-            const container = document.getElementById('wish-content');
-
-            // Check for premium themes (love, midnight)
-            let bgClass;
-            const theme = data.theme;
-
-            if (theme === 'love') {
-                bgClass = 'bg-love';
-            } else if (theme === 'midnight') {
-                bgClass = 'bg-midnight';
-            } else {
-                const themes = {
-                    classic: 'from-purple-500 to-pink-500',
-                    ocean: 'from-blue-400 to-indigo-600',
-                    sunshine: 'from-yellow-400 to-orange-500'
-                };
-                bgClass = `bg-gradient-to-br ${themes[theme] || themes.classic}`;
-            }
-
-            const viewEl = document.getElementById('view-wish');
-            // Reset classes
-            viewEl.className = 'min-h-screen relative overflow-hidden';
-            // Add background
-            if (theme === 'love' || theme === 'midnight') {
-                viewEl.classList.add(bgClass);
-            } else {
-                viewEl.classList.add(...bgClass.split(' '));
-            }
-
-            // Logic to inject specific effects
-            let effectsHtml = '';
-            if (theme === 'love') {
-                effectsHtml = `
-                    <div class="heart-bg" style="left: 10%; animation-delay: 0s;"></div>
-                    <div class="heart-bg" style="left: 30%; animation-delay: 2s; transform: scale(0.5) rotate(45deg);"></div>
-                    <div class="heart-bg" style="left: 70%; animation-delay: 4s;"></div>
-                    <div class="heart-bg" style="left: 50%; animation-delay: 6s; transform: scale(1.2) rotate(45deg);"></div>
-                    <div class="heart-bg" style="left: 90%; animation-delay: 1s;"></div>
-                `;
-            } else if (theme === 'midnight') {
-                let stars = "";
-                for (let i = 0; i < 50; i++) {
-                    const top = Math.random() * 100;
-                    const left = Math.random() * 100;
-                    const delay = Math.random() * 3;
-                    stars += `<div class="star" style="top: ${top}%; left: ${left}%; animation-delay: ${delay}s"></div>`;
-                }
-                effectsHtml = stars;
-            }
-
-            // Midnight glass card class
-            const cardClass = theme === 'midnight'
-                ? 'glass-card-midnight rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden'
-                : 'bg-white/95 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-white/50 relative overflow-hidden';
-
-            container.innerHTML = `
-                ${effectsHtml}
-                <canvas id="confetti-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
-                <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 text-center">
-                    
-                    <div id="phase-1" class="animate-fade-in-up">
-                        <div class="text-white text-sm md:text-lg font-bold tracking-[0.2em] mb-4 opacity-90 uppercase">It's a Special Day</div>
-                        <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive leading-tight">
-                            Happy Birthday<br><span class="text-yellow-300 relative inline-block transform -rotate-2">${data.recipient_name}</span>!
-                        </h1>
-                        <div class="cake-container relative mt-10 mb-20 cursor-pointer group transition-transform hover:scale-105 duration-300" onclick="blowCandle()">
-                            <div class="plate absolute bottom-0 w-64 h-4 bg-white rounded-full shadow-lg left-1/2 transform -translate-x-1/2 opacity-50"></div>
-                            <div class="cake-body w-48 h-32 bg-pink-300 mx-auto rounded-lg relative shadow-2xl flex items-center justify-center">
-                                <div class="absolute w-full h-4 bg-pink-400 top-1/2 transform -translate-y-1/2"></div>
-                                <div class="icing absolute -top-4 w-52 h-10 bg-white rounded-full shadow-sm"></div>
+                showShareModal(id) {
+                    const url = `${window.location.origin}/#wish/${id}`;
+                    const modal = document.createElement('div');
+                    modal.className = "fixed inset-0 bg-brand-navy/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4";
+                    modal.innerHTML = `
+                        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-bounce-in shadow-2xl relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-pink to-brand-navy"></div>
+                            <h3 class="text-2xl font-bold text-brand-navy mb-2">Ready to Gift! 🎉</h3>
+                            <div class="bg-gray-50 p-4 rounded-xl flex items-center mb-6 border border-gray-200 mt-4">
+                                <input type="text" value="${url}" readonly class="bg-transparent flex-1 outline-none text-sm text-gray-600 truncate font-mono">
+                                <button onclick="navigator.clipboard.writeText('${url}'); App.UI.toast('Copied!')" class="ml-3 text-brand-pink font-bold text-xs uppercase">Copy</button>
                             </div>
-                            <div class="candle absolute -top-16 left-1/2 transform -translate-x-1/2 w-4 h-16 bg-red-400 border-2 border-red-500 rounded">
-                                <div class="stripe w-full h-2 bg-white mt-2 transform -skew-y-12 opacity-50"></div>
-                                <div class="stripe w-full h-2 bg-white mt-4 transform -skew-y-12 opacity-50"></div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <a href="whatsapp://send?text=${encodeURIComponent('Happy Birthday! 🎂 ' + url)}" class="py-3 bg-[#25D366] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                                <button onclick="window.location.href='${url}'" class="py-3 bg-brand-navy text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90">Open Wish</button>
                             </div>
-                            <div id="flame" class="flame absolute -top-24 left-1/2 transform -translate-x-1/2 w-6 h-8 bg-yellow-400 rounded-full shadow-[0_0_20px_#ffcc00] animate-flicker">
-                                <div class="w-2 h-4 bg-white opacity-50 rounded-full mx-auto mt-2"></div>
-                            </div>
-                            <div class="mt-8 text-white text-sm font-bold bg-black/20 px-4 py-2 rounded-full inline-block backdrop-blur-sm animate-bounce">👇 Tap the candle to make a wish!</div>
-                        </div>
-                    </div>
-
-                    <div id="phase-2" class="hidden max-w-2xl w-full mx-auto transform transition-all duration-1000 translate-y-20 opacity-0">
-                        <div class="${cardClass}">
-                            <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl">🎉</div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-10 text-4xl">🎂</div>
-
-                            ${data.image_url ? `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-purple-200 shadow-lg transform hover:scale-105 transition duration-500">` : ''}
-                            
-                            <p class="text-2xl md:text-4xl text-brand-navy font-cursive leading-relaxed mb-8">"${data.message}"</p>
-                            
-                            <div class="flex items-center justify-center gap-3 text-sm text-gray-500 font-bold tracking-widest uppercase mb-4">
-                                <span class="h-px w-8 bg-gray-300"></span> With Love <span class="h-px w-8 bg-gray-300"></span>
-                            </div>
-
-                            <div class="mt-8 pt-6 border-t border-gray-100 bg-gray-50 -mx-8 -mb-8 px-8 pb-8">
-                                <p class="text-brand-navy font-bold text-sm mb-4">Did this make you smile? 😊<br><span class="text-brand-pink">Say thanks with a coffee!</span></p>
-                                <div class="flex gap-3 justify-center">
-                                    <button onclick="payForCoffee(10)" class="px-5 py-2.5 bg-white border-2 border-yellow-300 rounded-xl text-brand-navy font-bold hover:bg-yellow-50 text-xs transition transform hover:-translate-y-1 shadow-sm">₹10</button>
-                                    <button onclick="payForCoffee(50)" class="px-5 py-2.5 bg-white border-2 border-yellow-300 rounded-xl text-brand-navy font-bold hover:bg-yellow-50 text-xs transition transform hover:-translate-y-1 shadow-sm">₹50</button>
-                                    <button onclick="payForCoffee(100)" class="px-5 py-2.5 bg-yellow-400 text-brand-navy rounded-xl font-bold hover:bg-yellow-500 text-xs shadow-md transition transform hover:-translate-y-1 ring-2 ring-yellow-200">₹100</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-10">
-                            <a href="/create" data-link class="inline-block px-8 py-3 bg-white text-brand-pink rounded-full font-bold shadow-lg hover:scale-105 transition transform text-sm md:text-base ring-4 ring-brand-pink/30">Create your own WishLink 🎁</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- DASHBOARD ---
-        async function loadDashboard() {
-            if (!currentUser) return;
-
-            // CHECK PREMIUM FIRST
-            await checkPremiumStatus();
-
-            const list = document.getElementById('my-wishes-list');
-            list.innerHTML = '<div class="text-center py-10 col-span-full"><i class="fas fa-spinner fa-spin text-brand-pink text-3xl"></i><p class="text-gray-400 mt-2">Loading your wishes...</p></div>';
-
-            try {
-                const { data, error } = await supabase.from('wishes').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
-                if (error) throw error;
-
-                list.innerHTML = '';
-                if (!data || data.length === 0) {
-                    list.innerHTML = `<div class="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200 col-span-full"><p class="text-gray-500 font-medium mb-4">No wishes created yet.</p><a href="/create" data-link class="px-6 py-2 bg-brand-pink text-white rounded-full font-bold hover:bg-pink-700 transition shadow-lg">Create First Wish</a></div>`;
-                    return;
-                }
-
-                data.forEach(wish => {
-                    list.innerHTML += `
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition hover:-translate-y-1 duration-300" id="wish-card-${wish.id}">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-xl">🎂</div>
-                                <div>
-                                    <h4 class="font-bold text-gray-800 text-lg">${wish.recipient_name}</h4>
-                                    <p class="text-xs text-gray-500 truncate max-w-[150px] md:max-w-xs">${wish.message}</p>
-                                    <a href="/wish/${wish.id}" data-link class="text-brand-pink text-xs font-bold hover:underline mt-1 inline-flex items-center gap-1"><i class="fas fa-external-link-alt"></i> Open Wish 💌</a>
-                                </div>
-                            </div>
-                            <button onclick="deleteWish('${wish.id}', this)" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors"><i class="fas fa-trash-alt"></i></button>
+                            <button onclick="this.closest('.fixed').remove()" class="mt-4 text-xs text-gray-400 font-bold hover:text-gray-600">Close</button>
                         </div>
                     `;
-                });
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = '<p class="text-red-500 text-center col-span-full">Error loading data.</p>';
+                    document.body.appendChild(modal);
+                },
+
+                async loadDashboard() {
+                    if (!App.State.user) return App.Router.go('login');
+
+                    const list = document.getElementById('my-wishes-list');
+                    list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
+
+                    // Check banner
+                    const banner = document.getElementById('premium-banner');
+                    if (banner && !App.State.isPremium) banner.classList.remove('hidden');
+
+                    const { data, error } = await App.Services.supabase
+                        .from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
+
+                    if (!data || data.length === 0) {
+                        list.innerHTML = `<div class="text-center py-10 border-2 border-dashed rounded-xl bg-gray-50 text-gray-400">No wishes yet. Create one!</div>`;
+                        return;
+                    }
+
+                    list.innerHTML = data.map(w => `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-xl">🎂</div>
+                                <div>
+                                    <h4 class="font-bold text-brand-navy">${w.recipient_name}</h4>
+                                    <a href="#wish/${w.id}" class="text-xs text-brand-pink hover:underline">View Wish</a>
+                                </div>
+                            </div>
+                            <button onclick="App.Controllers.deleteWish('${w.id}')" class="text-gray-300 hover:text-red-500 transition px-2"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `).join('');
+                },
+
+                async deleteWish(id) {
+                    if (!confirm("Delete this wish?")) return;
+                    await App.Services.supabase.from('wishes').delete().eq('id', id);
+                    this.loadDashboard();
+                    App.UI.toast("Wish deleted");
+                },
+
+                async loadWish(id) {
+                    const container = document.getElementById('wish-content');
+                    container.innerHTML = '<div class="text-white flex flex-col items-center gap-4"><i class="fas fa-birthday-cake fa-bounce text-5xl"></i><p>Baking the cake...</p></div>';
+
+                    const { data, error } = await App.Services.supabase.from('wishes').select('*').eq('id', id).single();
+
+                    if (error || !data) {
+                        container.innerHTML = '<div class="text-white text-xl">Wish not found 😢</div>';
+                        return;
+                    }
+
+                    // Apply Theme Background
+                    const view = document.getElementById('view-wish');
+                    view.className = "view-section min-h-screen w-full relative overflow-hidden flex flex-col items-center justify-center"; // Reset
+
+                    if (data.theme === 'love') view.classList.add('bg-love');
+                    else if (data.theme === 'midnight') view.classList.add('bg-midnight');
+                    else {
+                        const colors = { classic: 'from-purple-500 to-pink-500', ocean: 'from-blue-400 to-indigo-600', sunshine: 'from-yellow-400 to-orange-500' };
+                        view.classList.add('bg-gradient-to-br');
+                        const grad = colors[data.theme] || colors.classic;
+                        grad.split(' ').forEach(c => view.classList.add(c));
+                    }
+
+                    // Generate Particles
+                    let particles = '';
+                    if (data.theme === 'love') {
+                        for (let i = 0; i < 6; i++) particles += `<div class="floating-heart text-white/30 text-4xl" style="left:${Math.random() * 100}%; animation-delay:${Math.random() * 5}s">❤️</div>`;
+                    } else if (data.theme === 'midnight') {
+                        for (let i = 0; i < 30; i++) particles += `<div class="star-twinkle" style="top:${Math.random() * 100}%; left:${Math.random() * 100}%; width:${Math.random() * 3}px; height:${Math.random() * 3}px; --duration:${2 + Math.random() * 3}s"></div>`;
+                    }
+
+                    const cardClass = data.theme === 'midnight' ? 'bg-white/10 border-white/20 text-white' : 'bg-white/90 border-white/50 text-brand-navy';
+
+                    container.innerHTML = `
+                        ${particles}
+                        
+                        <!-- Phase 1: Cake -->
+                        <div id="phase-1" class="text-center z-20 transition-all duration-700">
+                            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive">
+                                Happy Birthday <br> <span class="text-yellow-300">${data.recipient_name}</span>!
+                            </h1>
+                            <div class="relative cursor-pointer hover:scale-105 transition duration-300 inline-block mt-8" onclick="App.Controllers.blowCandle()">
+                                <div class="text-[150px] leading-none relative">
+                                    🎂
+                                    <div id="flame" class="absolute top-[-20px] left-[50%] transform -translate-x-1/2 text-5xl flame">🔥</div>
+                                </div>
+                                <div class="mt-8 bg-black/30 backdrop-blur-md text-white px-6 py-2 rounded-full text-sm font-bold animate-pulse">
+                                    🎤 Blow into mic OR 👇 Tap to wish
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2: Card (Hidden) -->
+                        <div id="phase-2" class="hidden opacity-0 transform translate-y-10 transition-all duration-1000 z-20 max-w-lg w-full px-4">
+                            <div class="${cardClass} backdrop-blur-xl rounded-3xl p-8 shadow-2xl border relative text-center">
+                                ${data.image_url ? `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white shadow-lg">` : ''}
+                                <p class="text-xl md:text-3xl font-cursive mb-6">"${data.message}"</p>
+                                <div class="flex items-center justify-center gap-3 opacity-60 text-xs font-bold uppercase tracking-widest mb-6">
+                                    <span class="h-px w-8 bg-current"></span> With Love <span class="h-px w-8 bg-current"></span>
+                                </div>
+                                <a href="#create" class="inline-block px-6 py-3 bg-brand-pink text-white rounded-full font-bold shadow-lg text-sm hover:scale-105 transition">Create your own</a>
+                            </div>
+                        </div>
+                    `;
+
+                    // Enable Audio & Mic
+                    document.body.onclick = () => {
+                        App.Audio.startMusic();
+                        // Only init mic once
+                        if (!App.State.audioContext) App.Audio.initMic(App.Controllers.blowCandle);
+                        document.body.onclick = null;
+                    };
+                },
+
+                blowCandle() {
+                    const flame = document.getElementById('flame');
+                    if (!flame || flame.classList.contains('hidden')) return;
+
+                    // 1. UI Changes
+                    flame.classList.add('hidden');
+
+                    // 2. Audio Effects
+                    const bg = document.getElementById('bg-music');
+                    const cheer = document.getElementById('cheer-audio');
+                    bg.pause();
+                    cheer.play();
+
+                    // 3. Confetti
+                    App.Controllers.startConfetti();
+
+                    // 4. Phase Transition
+                    const p1 = document.getElementById('phase-1');
+                    const p2 = document.getElementById('phase-2');
+
+                    p1.style.opacity = '0';
+                    p1.style.transform = 'scale(0.9)';
+
+                    setTimeout(() => {
+                        p1.classList.add('hidden');
+                        p2.classList.remove('hidden');
+                        requestAnimationFrame(() => {
+                            p2.classList.remove('opacity-0', 'translate-y-10');
+                        });
+                    }, 600);
+                },
+
+                startConfetti() {
+                    const canvas = document.getElementById('confetti-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+
+                    const particles = Array.from({ length: 150 }, () => ({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        color: ['#FF0055', '#FFD700', '#00BFFF', '#32CD32'][Math.floor(Math.random() * 4)],
+                        size: Math.random() * 8 + 2,
+                        speedY: Math.random() * 3 + 2,
+                        speedX: Math.random() * 2 - 1
+                    }));
+
+                    function loop() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        particles.forEach(p => {
+                            p.y += p.speedY;
+                            p.x += p.speedX;
+                            ctx.fillStyle = p.color;
+                            ctx.fillRect(p.x, p.y, p.size, p.size);
+                            if (p.y > canvas.height) p.y = -10;
+                        });
+                        requestAnimationFrame(loop);
+                    }
+                    loop();
+                }
             }
-        }
-
-        // --- DASHBOARD ACTIONS ---
-        window.deleteWish = async (id, btnElement) => {
-            if (!confirm("Are you sure?")) return;
-            const originalContent = btnElement.innerHTML;
-            btnElement.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-            btnElement.disabled = true;
-
-            try {
-                const { error } = await supabase.from('wishes').delete().eq('id', id);
-                if (error) throw error;
-                const card = document.getElementById(`wish-card-${id}`);
-                card.style.opacity = '0';
-                card.style.transform = 'translateX(20px)';
-                setTimeout(() => {
-                    card.remove();
-                    if (document.getElementById('my-wishes-list').children.length === 0) loadDashboard();
-                }, 300);
-                showToast("Wish deleted successfully");
-            } catch (e) {
-                showToast("Error deleting wish", "error");
-                btnElement.innerHTML = originalContent;
-                btnElement.disabled = false;
-            }
-        }
-
-        // --- INTERACTIVE ---
-        window.blowCandle = () => {
-            const flame = document.getElementById('flame');
-            const bgMusic = document.getElementById('bg-music');
-            const cheerAudio = document.getElementById('cheer-audio');
-
-            if (!flame || flame.classList.contains('hidden')) return;
-
-            // 1. Kill the Flame
-            flame.classList.add('hidden');
-
-            // 2. Audio Transition (The "Hooting" Fix)
-            if (bgMusic) {
-                bgMusic.pause(); // Stop the boring music
-                bgMusic.currentTime = 0; // Rewind
-            }
-
-            if (cheerAudio) {
-                cheerAudio.volume = 1.0;
-                cheerAudio.play().catch(e => console.log("Audio prevented", e));
-            }
-
-            startConfetti();
-
-            // 3. UI Transition
-            const phase1 = document.getElementById('phase-1');
-            const phase2 = document.getElementById('phase-2');
-
-            // Fade out cake
-            phase1.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
-            setTimeout(() => phase1.classList.add('hidden'), 500);
-
-            // Show Wish
-            phase2.classList.remove('hidden');
-            setTimeout(() => {
-                phase2.classList.remove('translate-y-20', 'opacity-0');
-            }, 100);
         };
 
-        function startConfetti() {
-            const canvas = document.getElementById('confetti-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const particles = [];
-            const colors = ['#FF0055', '#002366', '#3b82f6', '#eab308', '#22c55e'];
-            for (let i = 0; i < 150; i++) particles.push({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
-                size: Math.random() * 8 + 4, speedY: Math.random() * 3 + 2, speedX: Math.random() * 2 - 1,
-                color: colors[Math.floor(Math.random() * colors.length)], rotation: Math.random() * 360
-            });
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach((p, i) => {
-                    p.y += p.speedY; p.x += p.speedX; p.rotation += 2;
-                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation * Math.PI / 180);
-                    ctx.fillStyle = p.color; ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size); ctx.restore();
-                    if (p.y > canvas.height) particles[i].y = -10;
-                });
-                requestAnimationFrame(animate);
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            App.Services.init();
+            App.Router.init();
+
+            // File input preview
+            const fileInput = document.getElementById('image-upload');
+            if (fileInput) {
+                fileInput.onchange = (e) => {
+                    const name = e.target.files[0]?.name;
+                    document.getElementById('file-upload-text').textContent = name || "Click to upload";
+                    document.getElementById('file-upload-text').className = "text-brand-pink font-bold";
+                };
             }
-            animate();
-        }
 
-        async function loadAdmin() {
-            if (!currentUser) return navigateTo('/login');
-            const statsEl = document.getElementById('admin-stats');
-            const { count } = await supabase.from('wishes').select('*', { count: 'exact', head: true });
-            statsEl.innerText = `Total Wishes: ${count}`;
-        }
+            // Create Form
+            const form = document.getElementById('create-form');
+            if (form) form.addEventListener('submit', App.Controllers.handleCreate);
+        });
 
-        function showShareModal(id) {
-            // Clean URL generation
-            const url = `${window.location.origin}/wish/${id}`;
-            const modalHtml = `
-            <div id="success-modal" class="fixed inset-0 bg-brand-navy/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
-                <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-bounce-in shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-pink to-brand-navy"></div>
-                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm"><i class="fas fa-gift"></i></div>
-                    <h3 class="text-3xl font-extrabold text-brand-navy mb-2">It's Ready! 🎉</h3>
-                    <p class="text-gray-500 mb-6 text-sm">Your wish has been wrapped with love.</p>
-                    <div class="bg-gray-50 p-4 rounded-xl flex items-center mb-6 border border-gray-200">
-                        <input type="text" value="${url}" readonly class="bg-transparent flex-1 outline-none text-sm text-gray-600 truncate font-mono">
-                        <button onclick="navigator.clipboard.writeText('${url}'); showToast('Copied!')" class="ml-3 text-brand-pink font-bold text-xs uppercase tracking-wider hover:text-pink-700">Copy</button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <a href="whatsapp://send?text=${encodeURIComponent('Happy Birthday! 🎂 I made a special surprise for you: ' + url)}" class="col-span-1 py-3 bg-[#25D366] text-white rounded-xl flex items-center justify-center gap-2 hover:brightness-105 transition shadow-lg font-bold text-sm"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                        <button onclick="navigateTo('/wish/${id}'); document.getElementById('success-modal').remove()" class="col-span-1 py-3 bg-brand-navy text-white rounded-xl font-bold hover:bg-blue-900 transition shadow-lg flex items-center justify-center gap-2 text-sm"><i class="fas fa-external-link-alt"></i> Open</button>
-                    </div>
-                    <button onclick="document.getElementById('success-modal').remove()" class="text-gray-400 hover:text-gray-600 text-xs font-semibold">Maybe Later</button>
-                </div>
-            </div>`;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
     </script>
 </body>
 
