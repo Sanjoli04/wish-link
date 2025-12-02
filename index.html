@@ -57,7 +57,7 @@
             scroll-behavior: smooth;
         }
 
-        /* --- FLAME ANIMATIONS (Matches your style.css) --- */
+        /* --- FLAME ANIMATIONS --- */
         .flame {
             transform-origin: center bottom;
             animation: flicker 1.5s infinite ease-in-out;
@@ -516,8 +516,7 @@
     <script>
         // --- CAKE REGISTRY ---
         const CakeFactory = {
-            // Standard Interactive Candle Group (Scaled for 300x400 viewbox)
-            // Note: Scale 0.3 fits the 1000px coordinate system into the 300px one
+            // Standard Interactive Candle Group (Scaled & Positioned for these cakes)
             getCandles(x, y) {
                 return `
                     <g transform="translate(${x}, ${y}) scale(0.3)">
@@ -536,7 +535,7 @@
             // 1. Simple Vector Cake (Classic)
             getSimpleCake() {
                 return `
-                    <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="300" height="300" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
                         <ellipse cx="100" cy="170" rx="90" ry="15" fill="#f0f0f0" />
                         <ellipse cx="100" cy="168" rx="90" ry="15" fill="#e0e0e0" />
                         <path d="M40 110 L40 150 C40 165 160 165 160 150 L160 110" fill="#8B4513" />
@@ -548,10 +547,10 @@
                 `;
             },
 
-            // 2. Carrot Cake (Sunshine)
+            // 2. Carrot Cake (Sunshine) - Fixed SVG from Prompt
             getCarrotCake() {
                 return `
-                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
                         <defs>
                             <linearGradient id="frosting-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" style="stop-color:#FFF8E1" />
@@ -598,17 +597,17 @@
                             <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#sponge-grad)" />
                             <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#crumb-texture)" />
                         </g>
-                        ${this.getCandles(150, 190)}
-                        ${this.getCandles(120, 195)}
-                        ${this.getCandles(180, 195)}
+                        ${this.getCandles(150, 185)}
+                        ${this.getCandles(120, 190)}
+                        ${this.getCandles(180, 190)}
                     </svg>
                 `;
             },
 
-            // 3. White Berry Drip (Ocean)
+            // 3. White Berry Drip (Ocean) - Fixed SVG from Prompt
             getBerryCake() {
                 return `
-                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
                         <defs>
                             <linearGradient id="pink-body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" style="stop-color:#FFC1E3" />
@@ -658,15 +657,15 @@
                                 <circle cx="0" cy="8" r="7" />
                             </g>
                         </g>
-                        ${this.getCandles(150, 200)}
+                        ${this.getCandles(150, 185)}
                     </svg>
                 `;
             },
 
-            // 4. Red Velvet (Love - Premium)
+            // 4. Red Velvet (Love - Premium) - Fixed SVG from Prompt
             getRedVelvetCake() {
                 return `
-                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
                         <defs>
                             <linearGradient id="red-body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" style="stop-color:#D32F2F" />
@@ -714,10 +713,10 @@
                 `;
             },
 
-            // 5. Dark Chocolate (Midnight - Premium)
+            // 5. Dark Chocolate (Midnight - Premium) - Fixed SVG from Prompt
             getChocolateCake() {
                 return `
-                    <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
                         <defs>
                             <linearGradient id="sponge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" style="stop-color:#2D1B1E" />
