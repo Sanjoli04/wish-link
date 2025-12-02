@@ -57,7 +57,7 @@
             scroll-behavior: smooth;
         }
 
-        /* --- FLAME ANIMATIONS --- */
+        /* --- FLAME ANIMATIONS (Matches your style.css) --- */
         .flame {
             transform-origin: center bottom;
             animation: flicker 1.5s infinite ease-in-out;
@@ -563,12 +563,41 @@
                                 <stop offset="50%" style="stop-color:#EF6C00" />
                                 <stop offset="100%" style="stop-color:#BF360C" />
                             </linearGradient>
+                            <pattern id="crumb-texture" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                                <circle cx="2" cy="2" r="1" fill="#3E2723" opacity="0.1"/>
+                                <circle cx="7" cy="6" r="1" fill="#3E2723" opacity="0.1"/>
+                            </pattern>
+                            <mask id="crumb-mask">
+                                <rect x="0" y="0" width="300" height="400" fill="white"/>
+                            </mask>
+                            <filter id="soft-shadow">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                <feOffset dx="0" dy="2" result="offsetblur"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.3"/>
+                                </feComponentTransfer>
+                                <feMerge> 
+                                    <feMergeNode in="offsetblur"/>
+                                    <feMergeNode in="SourceGraphic"/> 
+                                </feMerge>
+                            </filter>
                         </defs>
                         <ellipse cx="150" cy="345" rx="90" ry="15" fill="#FFF" stroke="#CFD8DC" stroke-width="1"/>
-                        <path d="M 65 260 L 65 330 C 65 350, 235 350, 235 330 L 235 260" fill="url(#frosting-grad)" />
-                        <path d="M 65 260 C 65 280, 235 280, 235 260 C 235 240, 65 240, 65 260" fill="#FFE0B2" />
-                        <path d="M 95 190 L 95 240 C 95 255, 205 255, 205 240 L 205 190" fill="url(#frosting-grad)" />
-                        <path d="M 95 190 C 95 205, 205 205, 205 190 C 205 175, 95 175, 95 190" fill="#FFE0B2" />
+                        <g id="bottom-tier">
+                            <path d="M 65 260 L 65 330 C 65 350, 235 350, 235 330 L 235 260" fill="url(#frosting-grad)" />
+                            <path d="M 65 260 C 65 280, 235 280, 235 260 C 235 240, 65 240, 65 260" fill="#FFE0B2" />
+                            <g mask="url(#crumb-mask)">
+                                <path d="M 65 295 C 65 315, 235 315, 235 295 L 235 285 C 235 305, 65 305, 65 285 Z" fill="url(#sponge-grad)" />
+                                <path d="M 65 295 C 65 315, 235 315, 235 295 L 235 285 C 235 305, 65 305, 65 285 Z" fill="url(#crumb-texture)" />
+                            </g>
+                            <ellipse cx="150" cy="260" rx="60" ry="8" fill="#000" opacity="0.2" filter="url(#soft-shadow)" />
+                        </g>
+                        <g id="top-tier" transform="translate(0, 20)">
+                            <path d="M 95 190 L 95 240 C 95 255, 205 255, 205 240 L 205 190" fill="url(#frosting-grad)" />
+                            <path d="M 95 190 C 95 205, 205 205, 205 190 C 205 175, 95 175, 95 190" fill="#FFE0B2" />
+                            <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#sponge-grad)" />
+                            <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#crumb-texture)" />
+                        </g>
                         ${this.getCandles(150, 190)}
                         ${this.getCandles(120, 195)}
                         ${this.getCandles(180, 195)}
@@ -589,13 +618,46 @@
                                 <stop offset="0%" style="stop-color:#FFFFFF" />
                                 <stop offset="100%" style="stop-color:#E0E0E0" />
                             </linearGradient>
+                            <filter id="soft-blur">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" />
+                            </filter>
                         </defs>
-                        <ellipse cx="150" cy="340" rx="90" ry="12" fill="#5D4037" opacity="0.2" />
-                        <path d="M 70 260 L 70 320 C 70 340, 230 340, 230 320 L 230 260" fill="url(#pink-body-grad)" />
-                        <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#F48FB1" />
-                        <path d="M 85 200 L 85 250 C 85 265, 215 265, 215 250 L 215 200" fill="url(#pink-body-grad)" />
-                        <path d="M 85 200 C 85 215, 215 215, 215 200 C 215 185, 85 185, 85 200" fill="#F48FB1" />
-                        <path d="M 85 200 L 85 210 Q 85 225, 100 225 Q 110 225, 110 215 Q 110 235, 130 235 Q 145 235, 145 215 Q 145 230, 160 230 Q 175 230, 175 210 Q 175 225, 195 225 Q 215 225, 215 210 L 215 200 C 215 185, 85 185, 85 200 Z" fill="url(#white-frost-grad)" />
+                        <ellipse cx="150" cy="340" rx="90" ry="12" fill="#5D4037" opacity="0.2" filter="url(#soft-blur)" />
+                        <g id="bottom-tier">
+                            <path d="M 70 260 L 70 320 C 70 340, 230 340, 230 320 L 230 260" fill="url(#pink-body-grad)" />
+                            <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#F48FB1" />
+                            <ellipse cx="150" cy="260" rx="60" ry="8" fill="#4E342E" opacity="0.15" filter="url(#soft-blur)" />
+                        </g>
+                        <g id="top-tier" transform="translate(0, 10)">
+                            <path d="M 85 200 L 85 250 C 85 265, 215 265, 215 250 L 215 200" fill="url(#pink-body-grad)" />
+                            <path d="M 85 200 C 85 215, 215 215, 215 200 C 215 185, 85 185, 85 200" fill="#F48FB1" />
+                        </g>
+                        <g id="lower-drip">
+                            <path d="M 70 260 L 70 270 Q 70 285, 85 285 Q 95 285, 95 270 Q 95 280, 105 280 Q 115 280, 115 265 Q 115 295, 135 295 Q 155 295, 155 270 Q 155 290, 175 290 Q 195 290, 195 265 Q 195 280, 210 280 Q 225 280, 225 265 L 230 265 L 230 260 C 230 240, 70 240, 70 260 Z" fill="url(#white-frost-grad)" />
+                        </g>
+                        <g id="upper-drip" transform="translate(0, 10)">
+                            <path d="M 85 200 L 85 210 Q 85 225, 100 225 Q 110 225, 110 215 Q 110 235, 130 235 Q 145 235, 145 215 Q 145 230, 160 230 Q 175 230, 175 210 Q 175 225, 195 225 Q 215 225, 215 210 L 215 200 C 215 185, 85 185, 85 200 Z" fill="url(#white-frost-grad)" />
+                        </g>
+                        <g transform="translate(150, 205)">
+                            <g stroke="#B71C1C" stroke-width="0.5">
+                                <path d="M -10 -5 Q 0 15 10 -5 Q 10 -20 0 -25 Q -10 -20 -10 -5" fill="#EF5350" />
+                                <g transform="translate(-25, 10) rotate(-20)">
+                                    <path d="M -8 -4 Q 0 12 8 -4 Q 8 -16 0 -20 Q -8 -16 -8 -4" fill="#EF5350" />
+                                </g>
+                                <g transform="translate(25, 10) rotate(20)">
+                                    <path d="M -8 -4 Q 0 12 8 -4 Q 8 -16 0 -20 Q -8 -16 -8 -4" fill="#EF5350" />
+                                </g>
+                            </g>
+                            <g fill="#FFEB3B" opacity="0.6">
+                                <circle cx="0" cy="-10" r="0.8"/><circle cx="-5" cy="-5" r="0.8"/><circle cx="5" cy="-5" r="0.8"/>
+                                <circle cx="-25" cy="5" r="0.8"/><circle cx="25" cy="5" r="0.8"/>
+                            </g>
+                            <g fill="#3F51B5">
+                                <circle cx="-15" cy="5" r="6" />
+                                <circle cx="15" cy="5" r="6" />
+                                <circle cx="0" cy="8" r="7" />
+                            </g>
+                        </g>
                         ${this.getCandles(150, 200)}
                     </svg>
                 `;
@@ -615,13 +677,36 @@
                                 <stop offset="0%" style="stop-color:#FFF" />
                                 <stop offset="100%" style="stop-color:#E0E0E0" />
                             </linearGradient>
+                            <filter id="shadow-blur">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+                            </filter>
                         </defs>
+                        <ellipse cx="150" cy="350" rx="90" ry="10" fill="#5D4037" opacity="0.4" filter="url(#shadow-blur)" />
                         <ellipse cx="150" cy="345" rx="85" ry="15" fill="#FBC02D" />
-                        <path d="M 70 260 L 70 330 C 70 350, 230 350, 230 330 L 230 260" fill="url(#red-body-grad)" />
-                        <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#B71C1C" />
-                        <path d="M 70 280 C 70 300, 230 300, 230 280" fill="none" stroke="url(#cream-grad)" stroke-width="4" opacity="0.95"/>
-                        <path d="M 100 180 L 100 240 C 100 255, 200 255, 200 240 L 200 180" fill="url(#red-body-grad)" />
-                        <path d="M 100 180 C 100 195, 200 195, 200 180 C 200 165, 100 165, 100 180" fill="#E57373" />
+                        <path d="M 65 345 L 65 350 C 65 360, 235 360, 235 350 L 235 345" fill="#F57F17" />
+                        <g id="bottom-tier">
+                            <path d="M 70 260 L 70 330 C 70 350, 230 350, 230 330 L 230 260" fill="url(#red-body-grad)" />
+                            <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#B71C1C" />
+                            <path d="M 70 280 C 70 300, 230 300, 230 280" fill="none" stroke="url(#cream-grad)" stroke-width="4" opacity="0.95"/>
+                            <path d="M 70 305 C 70 325, 230 325, 230 305" fill="none" stroke="url(#cream-grad)" stroke-width="4" opacity="0.95"/>
+                            <ellipse cx="150" cy="260" rx="55" ry="10" fill="#000" opacity="0.3" filter="url(#shadow-blur)" />
+                        </g>
+                        <g id="top-tier" transform="translate(0, 20)">
+                            <path d="M 100 180 L 100 240 C 100 255, 200 255, 200 240 L 200 180" fill="url(#red-body-grad)" />
+                            <path d="M 100 180 C 100 195, 200 195, 200 180 C 200 165, 100 165, 100 180" fill="#E57373" />
+                            <path d="M 100 210 C 100 225, 200 225, 200 210" fill="none" stroke="url(#cream-grad)" stroke-width="3" opacity="0.95"/>
+                            <g transform="translate(0, 5)" opacity="0.2">
+                                <path d="M 102 242 C 102 257, 198 257, 198 242" stroke="#000" stroke-width="6" stroke-dasharray="0 8" stroke-linecap="round" fill="none" />
+                            </g>
+                            <path d="M 102 242 C 102 257, 198 257, 198 242" stroke="#FFF" stroke-width="6" stroke-dasharray="0 8" stroke-linecap="round" fill="none" />
+                            <g fill="#FFF" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.2))">
+                                <circle cx="110" cy="180" r="5"/> <circle cx="130" cy="185" r="5"/>
+                                <circle cx="150" cy="187" r="5"/> <circle cx="170" cy="185" r="5"/>
+                                <circle cx="190" cy="180" r="5"/> <circle cx="120" cy="170" r="5"/>
+                                <circle cx="140" cy="165" r="5"/> <circle cx="160" cy="165" r="5"/>
+                                <circle cx="180" cy="170" r="5"/>
+                            </g>
+                        </g>
                         ${this.getCandles(150, 180)}
                         ${this.getCandles(120, 185)}
                         ${this.getCandles(180, 185)}
@@ -636,18 +721,124 @@
                         <defs>
                             <linearGradient id="sponge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" style="stop-color:#2D1B1E" />
+                                <stop offset="40%" style="stop-color:#3E2723" />
                                 <stop offset="100%" style="stop-color:#1A0F0F" />
                             </linearGradient>
+                            <linearGradient id="cream-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#FFFFFF" />
+                                <stop offset="100%" style="stop-color:#ECEFF1" />
+                            </linearGradient>
+                            <radialGradient id="cherry-grad" cx="35%" cy="35%" r="65%">
+                                <stop offset="0%" style="stop-color:#FF5252" />
+                                <stop offset="50%" style="stop-color:#D32F2F" />
+                                <stop offset="100%" style="stop-color:#880E4F" />
+                            </radialGradient>
+                            <filter id="cream-shadow">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" />
+                                <feOffset dx="0" dy="2" result="offsetblur"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.3"/>
+                                </feComponentTransfer>
+                                <feMerge> 
+                                    <feMergeNode in="offsetblur"/>
+                                    <feMergeNode in="SourceGraphic"/> 
+                                </feMerge>
+                            </filter>
+                            <symbol id="bark-flat" viewBox="0 0 30 15">
+                                <path d="M 0 5 L 10 2 L 20 4 L 30 0 L 28 10 L 15 14 L 2 12 Z" fill="#3E2723"/>
+                                <path d="M 5 6 L 25 5 M 10 10 L 20 8" stroke="#5D4037" stroke-width="0.5" opacity="0.3"/>
+                            </symbol>
+                            <symbol id="bark-curl" viewBox="0 0 30 15">
+                                <path d="M 2 12 Q 15 0 28 8 L 26 14 Q 15 6 4 14 Z" fill="#4E342E"/>
+                                <path d="M 5 10 Q 15 4 25 9" stroke="#6D4C41" stroke-width="1" opacity="0.5" fill="none"/>
+                            </symbol>
+                            <symbol id="bark-shards" viewBox="0 0 20 20">
+                                <path d="M 2 8 L 8 2 L 12 9 Z" fill="#2D1B1E"/>
+                                <path d="M 10 12 L 18 6 L 15 15 Z" fill="#3E2723"/>
+                                <path d="M 5 15 L 8 18 L 2 19 Z" fill="#4E342E"/>
+                            </symbol>
                         </defs>
-                        <ellipse cx="175" cy="340" rx="100" ry="12" fill="#1A0F0F" opacity="0.4" />
-                        <path d="M 75 220 L 75 310 C 75 340, 275 340, 275 310 L 275 220" fill="url(#sponge-grad)" />
-                        <path d="M 75 220 C 75 250, 275 250, 275 220 C 275 190, 75 190, 75 220" fill="#2D1B1E" />
-                        <!-- Shavings -->
-                        <path d="M 80 225 L 120 225 L 120 245 Z" fill="#3E2723" />
-                        <path d="M 150 230 L 190 230 L 190 250 Z" fill="#4E342E" />
+                        <ellipse cx="175" cy="340" rx="100" ry="12" fill="#1A0F0F" opacity="0.4" filter="url(#cream-shadow)" />
+                        <g id="cake-foundation">
+                            <path d="M 75 220 L 75 310 C 75 340, 275 340, 275 310 L 275 220" fill="url(#sponge-grad)" />
+                            <path d="M 75 220 C 75 250, 275 250, 275 220 C 275 190, 75 190, 75 220" fill="#2D1B1E" />
+                        </g>
+                        <g id="texture-layer" filter="drop-shadow(1px 2px 2px rgba(0,0,0,0.3))">
+                            <use href="#bark-flat" x="80" y="225" width="40" height="20" transform="rotate(-10 100 235)" fill="#1A0F0F"/>
+                            <use href="#bark-flat" x="130" y="240" width="45" height="22" transform="rotate(5 152 251)" fill="#2D1B1E"/>
+                            <use href="#bark-flat" x="180" y="230" width="40" height="20" transform="rotate(-5 200 240)" fill="#1A0F0F"/>
+                            <use href="#bark-flat" x="220" y="250" width="42" height="21" transform="rotate(8 241 260)" fill="#2D1B1E"/>
+                            <use href="#bark-curl" x="90" y="260" width="35" height="17" transform="rotate(15 107 268)"/>
+                            <use href="#bark-curl" x="140" y="270" width="38" height="19" transform="rotate(-5 159 279)"/>
+                            <use href="#bark-curl" x="190" y="265" width="36" height="18" transform="rotate(10 208 274)"/>
+                            <use href="#bark-curl" x="235" y="225" width="30" height="15" transform="rotate(-20 250 232)"/>
+                            <use href="#bark-curl" x="110" y="225" width="32" height="16" transform="rotate(-15 126 233)"/>
+                            <use href="#bark-shards" x="100" y="290" width="25" height="25" />
+                            <use href="#bark-shards" x="160" y="285" width="20" height="20" transform="rotate(45 170 295)"/>
+                            <use href="#bark-shards" x="220" y="280" width="22" height="22" transform="rotate(-30 231 291)"/>
+                            <use href="#bark-flat" x="120" y="285" width="30" height="15" transform="rotate(30 135 292)" fill="#4E342E"/>
+                            <use href="#bark-shards" x="85" y="215" width="15" height="15" />
+                            <use href="#bark-shards" x="255" y="210" width="15" height="15" />
+                        </g>
+                        <g id="bottom-cream" transform="translate(0, 8)">
+                            <g fill="url(#cream-grad)" filter="url(#cream-shadow)">
+                                <circle cx="85" cy="310" r="14" />
+                                <circle cx="105" cy="318" r="14" />
+                                <circle cx="130" cy="324" r="14" />
+                                <circle cx="155" cy="328" r="14" />
+                                <circle cx="180" cy="330" r="14" />
+                                <circle cx="205" cy="328" r="14" />
+                                <circle cx="230" cy="324" r="14" />
+                                <circle cx="250" cy="318" r="14" />
+                                <circle cx="265" cy="310" r="14" />
+                            </g>
+                        </g>
+                        <g id="top-cream">
+                            <g fill="url(#cream-grad)" filter="url(#cream-shadow)">
+                                <g opacity="0.8">
+                                    <circle cx="100" cy="200" r="12" />
+                                    <circle cx="125" cy="195" r="12" />
+                                    <circle cx="150" cy="192" r="12" />
+                                    <circle cx="175" cy="190" r="12" />
+                                    <circle cx="200" cy="192" r="12" />
+                                    <circle cx="225" cy="195" r="12" />
+                                    <circle cx="250" cy="200" r="12" />
+                                </g>
+                                <circle cx="85" cy="215" r="14" />
+                                <circle cx="105" cy="225" r="14" />
+                                <circle cx="130" cy="235" r="14" />
+                                <circle cx="160" cy="240" r="14" />
+                                <circle cx="190" cy="238" r="14" />
+                                <circle cx="220" cy="230" r="14" />
+                                <circle cx="245" cy="220" r="14" />
+                                <circle cx="265" cy="210" r="14" />
+                            </g>
+                        </g>
+                        <g id="cherries" transform="translate(0, 2)">
+                            <defs>
+                                <g id="single-cherry">
+                                    <path d="M 0 0 Q 3 -12 12 -8" stroke="#3E2723" stroke-width="1.5" fill="none" transform="translate(0, -8)"/>
+                                    <circle cx="0" cy="0" r="9" fill="url(#cherry-grad)" />
+                                    <ellipse cx="-3" cy="-3" rx="3" ry="1.5" fill="white" opacity="0.7" transform="rotate(-45)"/>
+                                </g>
+                            </defs>
+                            <use href="#single-cherry" x="100" y="195" />
+                            <use href="#single-cherry" x="125" y="190" />
+                            <use href="#single-cherry" x="150" y="187" />
+                            <use href="#single-cherry" x="175" y="185" />
+                            <use href="#single-cherry" x="200" y="187" />
+                            <use href="#single-cherry" x="225" y="190" />
+                            <use href="#single-cherry" x="250" y="195" />
+                            <use href="#single-cherry" x="85" y="210" />
+                            <use href="#single-cherry" x="105" y="220" />
+                            <use href="#single-cherry" x="130" y="230" />
+                            <use href="#single-cherry" x="160" y="235" />
+                            <use href="#single-cherry" x="190" y="233" />
+                            <use href="#single-cherry" x="220" y="225" />
+                            <use href="#single-cherry" x="245" y="215" />
+                            <use href="#single-cherry" x="265" y="205" />
+                        </g>
                         ${this.getCandles(175, 220)}
-                        ${this.getCandles(125, 230)}
-                        ${this.getCandles(225, 230)}
                     </svg>
                 `;
             }
@@ -847,7 +1038,7 @@
                             for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
                             const average = sum / bufferLength;
 
-                            if (average > 40) { // Threshold adjusted to match script.js
+                            if (average > 40) { // Threshold from script.js
                                 onBlow();
                                 this.stopMic();
                             } else {
