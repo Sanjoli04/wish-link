@@ -389,6 +389,7 @@
                     class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition"><i
                         class="fas fa-plus"></i> New Wish</a>
             </div>
+            <!-- Premium Banner -->
             <div id="premium-banner"
                 class="hidden bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
                 <div>
@@ -515,7 +516,24 @@
     <script>
         // --- CAKE REGISTRY ---
         const CakeFactory = {
-            // 1. Simple SVG for Free Users (Standard Vector)
+            // Standard Interactive Candle Group (Scaled for 300x400 viewbox)
+            // Note: Scale 0.3 fits the 1000px coordinate system into the 300px one
+            getCandles(x, y) {
+                return `
+                    <g transform="translate(${x}, ${y}) scale(0.3)">
+                        <g class="candle">
+                            <rect x="-25" y="0" width="50" height="100" rx="8" fill="#ffd700" />
+                            <rect x="-15" y="-30" width="30" height="35" rx="4" fill="#ffed4e" />
+                            <g class="flame" style="transform-origin: 0px -30px;">
+                                <path d="M 0 -30 Q -15 -80 0 -120 Q 15 -80 0 -30" fill="#ffb700" style="filter: drop-shadow(0 0 10px #ffb700);"/>
+                                <path d="M 0 -35 Q -7 -70 0 -100 Q 7 -70 0 -35" fill="#ffd700" />
+                            </g>
+                        </g>
+                    </g>
+                `;
+            },
+
+            // 1. Simple Vector Cake (Classic)
             getSimpleCake() {
                 return `
                     <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -525,99 +543,113 @@
                         <ellipse cx="100" cy="110" rx="60" ry="20" fill="#A0522D" />
                         <path d="M38 110 C38 110 50 130 70 115 C90 100 110 130 130 115 C150 100 162 110 162 110 L162 100 C162 100 100 80 38 100 Z" fill="#FFC0CB" />
                         <ellipse cx="100" cy="100" rx="62" ry="22" fill="#FFB6C1" />
-                        <rect x="92" y="60" width="16" height="50" rx="2" fill="#F44336" />
-                        <path d="M92 70 L108 65" stroke="white" stroke-width="2" stroke-opacity="0.5" />
-                        <g class="flame">
-                            <path d="M100 60 Q105 50 100 25 Q95 50 100 60" fill="#FFD700" />
-                            <path d="M100 55 Q103 48 100 35 Q97 48 100 55" fill="#FFA500" />
-                        </g>
+                        ${this.getCandles(100, 60)}
                     </svg>
                 `;
             },
 
-            // 2. High-Fidelity "Real" Cake (From your Personal Project)
-            getPremiumCake() {
+            // 2. Carrot Cake (Sunshine)
+            getCarrotCake() {
                 return `
-                    <svg id="birthday-cake" width="300" height="300" viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="5" result="blur" />
-                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                            </filter>
+                            <linearGradient id="frosting-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#FFF8E1" />
+                                <stop offset="20%" style="stop-color:#FFFFFF" />
+                                <stop offset="100%" style="stop-color:#FFE0B2" />
+                            </linearGradient>
+                            <linearGradient id="sponge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#D84315" />
+                                <stop offset="50%" style="stop-color:#EF6C00" />
+                                <stop offset="100%" style="stop-color:#BF360C" />
+                            </linearGradient>
                         </defs>
-                        <g id="whole-cake">
-                            <g id="plate">
-                                <ellipse cx="500" cy="750" rx="380" ry="100" fill="#ffa500" />
-                                <ellipse cx="500" cy="730" rx="370" ry="90" fill="#f5b847" />
-                            </g>
-                            <g id="cake-sponge">
-                                <rect x="150" y="450" width="700" height="300" rx="50" fill="#5e2b14" />
-                            </g>
-                            <g id="frosting">
-                                <path d="M 140 450 C 140 550, 180 620, 220 550 Q 250 500, 280 550 C 300 600, 360 620, 390 530 Q 420 490, 460 560 C 480 640, 540 640, 560 550 Q 590 500, 620 560 C 640 620, 700 610, 730 530 Q 760 490, 790 540 C 800 580, 860 550, 860 450 A 360 80 0 0 0 140 450" fill="#f0e4c3" />
-                                <ellipse cx="500" cy="450" rx="300" ry="60" fill="#ffffff" opacity="0.3" />
-                            </g>
-                            <g id="sprinkles">
-                                <rect x="250" y="420" width="12" height="40" rx="6" fill="#ff9f43" transform="rotate(-30 256 440)" />
-                                <rect x="420" y="400" width="12" height="35" rx="6" fill="#ff9f43" transform="rotate(45 426 417)" />
-                                <rect x="580" y="410" width="12" height="38" rx="6" fill="#ff9f43" transform="rotate(-20 586 429)" />
-                                <rect x="750" y="425" width="12" height="40" rx="6" fill="#ff9f43" transform="rotate(35 756 445)" />
-                                <rect x="320" y="435" width="12" height="36" rx="6" fill="#7cb342" transform="rotate(60 326 453)" />
-                                <rect x="650" y="440" width="12" height="36" rx="6" fill="#7cb342" transform="rotate(-45 656 458)" />
-                                <rect x="380" y="450" width="12" height="32" rx="6" fill="#e8d5b7" transform="rotate(25 386 466)" />
-                                <rect x="700" y="455" width="12" height="32" rx="6" fill="#e8d5b7" transform="rotate(-60 706 471)" />
-                            </g>
-                            <g id="candles">
-                                <g class="candle">
-                                    <rect x="280" y="360" width="50" height="100" rx="8" fill="#ffd700" />
-                                    <g class="flame" style="transform-origin: 305px 330px;">
-                                        <path d="M 305 330 Q 290 280 305 240 Q 320 280 305 330" fill="#ffb700" filter="url(#glow)" />
-                                        <path d="M 305 325 Q 298 290 305 260 Q 312 290 305 325" fill="#ffd700" />
-                                    </g>
-                                </g>
-                                <g class="candle">
-                                    <rect x="400" y="340" width="50" height="100" rx="8" fill="#66bb6a" />
-                                    <g class="flame" style="transform-origin: 425px 310px;">
-                                        <path d="M 425 310 Q 410 260 425 220 Q 440 260 425 310" fill="#ffb700" filter="url(#glow)" />
-                                        <path d="M 425 305 Q 418 270 425 240 Q 432 270 425 305" fill="#ffd700" />
-                                    </g>
-                                </g>
-                                <g class="candle">
-                                    <rect x="550" y="340" width="50" height="100" rx="8" fill="#ef9a9a" />
-                                    <g class="flame" style="transform-origin: 575px 310px;">
-                                        <path d="M 575 310 Q 560 260 575 220 Q 590 260 575 310" fill="#ffb700" filter="url(#glow)" />
-                                        <path d="M 575 305 Q 568 270 575 240 Q 582 270 575 305" fill="#ffd700" />
-                                    </g>
-                                </g>
-                                <g class="candle">
-                                    <rect x="670" y="360" width="50" height="100" rx="8" fill="#80deea" />
-                                    <g class="flame" style="transform-origin: 695px 330px;">
-                                        <path d="M 695 330 Q 680 280 695 240 Q 710 280 695 330" fill="#ffb700" filter="url(#glow)" />
-                                        <path d="M 695 325 Q 688 290 695 260 Q 702 290 695 325" fill="#ffd700" />
-                                    </g>
-                                </g>
-                                <g class="candle">
-                                    <rect x="500" y="380" width="50" height="100" rx="8" fill="#ba68c8" />
-                                    <g class="flame" style="transform-origin: 525px 350px;">
-                                        <path d="M 525 350 Q 510 300 525 260 Q 540 300 525 350" fill="#ffb700" filter="url(#glow)" />
-                                        <path d="M 525 345 Q 518 310 525 280 Q 532 310 525 345" fill="#ffd700" />
-                                    </g>
-                                </g>
-                            </g>
-                        </g>
+                        <ellipse cx="150" cy="345" rx="90" ry="15" fill="#FFF" stroke="#CFD8DC" stroke-width="1"/>
+                        <path d="M 65 260 L 65 330 C 65 350, 235 350, 235 330 L 235 260" fill="url(#frosting-grad)" />
+                        <path d="M 65 260 C 65 280, 235 280, 235 260 C 235 240, 65 240, 65 260" fill="#FFE0B2" />
+                        <path d="M 95 190 L 95 240 C 95 255, 205 255, 205 240 L 205 190" fill="url(#frosting-grad)" />
+                        <path d="M 95 190 C 95 205, 205 205, 205 190 C 205 175, 95 175, 95 190" fill="#FFE0B2" />
+                        ${this.getCandles(150, 190)}
+                        ${this.getCandles(120, 195)}
+                        ${this.getCandles(180, 195)}
                     </svg>
                 `;
             },
 
-            // 3. Dark Chocolate Cake (for Midnight Theme)
-            getMidnightCake() {
-                // Copy of premium but with dark chocolate colors
-                let svg = this.getPremiumCake();
-                // Replace colors for dark theme
-                svg = svg.replace(/#5e2b14/g, "#3e1e0f"); // Darker sponge
-                svg = svg.replace(/#f0e4c3/g, "#5D4037"); // Chocolate frosting
-                svg = svg.replace(/#ffffff/g, "#8D6E63"); // Frosting highlight
-                return svg;
+            // 3. White Berry Drip (Ocean)
+            getBerryCake() {
+                return `
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="pink-body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#FFC1E3" />
+                                <stop offset="100%" style="stop-color:#F06292" />
+                            </linearGradient>
+                            <linearGradient id="white-frost-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFFFFF" />
+                                <stop offset="100%" style="stop-color:#E0E0E0" />
+                            </linearGradient>
+                        </defs>
+                        <ellipse cx="150" cy="340" rx="90" ry="12" fill="#5D4037" opacity="0.2" />
+                        <path d="M 70 260 L 70 320 C 70 340, 230 340, 230 320 L 230 260" fill="url(#pink-body-grad)" />
+                        <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#F48FB1" />
+                        <path d="M 85 200 L 85 250 C 85 265, 215 265, 215 250 L 215 200" fill="url(#pink-body-grad)" />
+                        <path d="M 85 200 C 85 215, 215 215, 215 200 C 215 185, 85 185, 85 200" fill="#F48FB1" />
+                        <path d="M 85 200 L 85 210 Q 85 225, 100 225 Q 110 225, 110 215 Q 110 235, 130 235 Q 145 235, 145 215 Q 145 230, 160 230 Q 175 230, 175 210 Q 175 225, 195 225 Q 215 225, 215 210 L 215 200 C 215 185, 85 185, 85 200 Z" fill="url(#white-frost-grad)" />
+                        ${this.getCandles(150, 200)}
+                    </svg>
+                `;
+            },
+
+            // 4. Red Velvet (Love - Premium)
+            getRedVelvetCake() {
+                return `
+                    <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="red-body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#D32F2F" />
+                                <stop offset="50%" style="stop-color:#C62828" />
+                                <stop offset="100%" style="stop-color:#8E0000" />
+                            </linearGradient>
+                            <linearGradient id="cream-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#FFF" />
+                                <stop offset="100%" style="stop-color:#E0E0E0" />
+                            </linearGradient>
+                        </defs>
+                        <ellipse cx="150" cy="345" rx="85" ry="15" fill="#FBC02D" />
+                        <path d="M 70 260 L 70 330 C 70 350, 230 350, 230 330 L 230 260" fill="url(#red-body-grad)" />
+                        <path d="M 70 260 C 70 280, 230 280, 230 260 C 230 240, 70 240, 70 260" fill="#B71C1C" />
+                        <path d="M 70 280 C 70 300, 230 300, 230 280" fill="none" stroke="url(#cream-grad)" stroke-width="4" opacity="0.95"/>
+                        <path d="M 100 180 L 100 240 C 100 255, 200 255, 200 240 L 200 180" fill="url(#red-body-grad)" />
+                        <path d="M 100 180 C 100 195, 200 195, 200 180 C 200 165, 100 165, 100 180" fill="#E57373" />
+                        ${this.getCandles(150, 180)}
+                        ${this.getCandles(120, 185)}
+                        ${this.getCandles(180, 185)}
+                    </svg>
+                `;
+            },
+
+            // 5. Dark Chocolate (Midnight - Premium)
+            getChocolateCake() {
+                return `
+                    <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="sponge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#2D1B1E" />
+                                <stop offset="100%" style="stop-color:#1A0F0F" />
+                            </linearGradient>
+                        </defs>
+                        <ellipse cx="175" cy="340" rx="100" ry="12" fill="#1A0F0F" opacity="0.4" />
+                        <path d="M 75 220 L 75 310 C 75 340, 275 340, 275 310 L 275 220" fill="url(#sponge-grad)" />
+                        <path d="M 75 220 C 75 250, 275 250, 275 220 C 275 190, 75 190, 75 220" fill="#2D1B1E" />
+                        <!-- Shavings -->
+                        <path d="M 80 225 L 120 225 L 120 245 Z" fill="#3E2723" />
+                        <path d="M 150 230 L 190 230 L 190 250 Z" fill="#4E342E" />
+                        ${this.getCandles(175, 220)}
+                        ${this.getCandles(125, 230)}
+                        ${this.getCandles(225, 230)}
+                    </svg>
+                `;
             }
         };
 
@@ -687,12 +719,14 @@
 
             Services: {
                 supabase: null,
+
                 init() {
                     if (typeof CONFIG === 'undefined') {
                         App.UI.toast('Config missing!', 'error');
                         return;
                     }
                     this.supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
                     this.supabase.auth.onAuthStateChange((event, session) => {
                         App.State.user = session?.user || null;
                         App.Controllers.updateNav();
@@ -704,15 +738,21 @@
                         }
                     });
                 },
+
                 async login() {
-                    const { error } = await this.supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+                    const { error } = await this.supabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: { redirectTo: window.location.origin }
+                    });
                     if (error) App.UI.toast(error.message, 'error');
                 },
+
                 async logout() {
                     await this.supabase.auth.signOut();
                     App.UI.toast('Logged out successfully');
                     App.Router.go('home');
                 },
+
                 async uploadImage(file) {
                     const formData = new FormData();
                     formData.append('file', file);
@@ -722,6 +762,7 @@
                     const data = await res.json();
                     return data.secure_url;
                 },
+
                 checkPremium() {
                     if (!App.State.user) return;
                     const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
@@ -732,6 +773,7 @@
                         if (banner) banner.classList.add('hidden');
                     }
                 },
+
                 buyPremium() {
                     this.triggerPayment(4900, "WishLink Premium", "Unlock all themes", () => {
                         App.UI.toast("Payment Successful! Premium Unlocked 👑");
@@ -739,18 +781,24 @@
                         App.Services.checkPremium();
                     });
                 },
+
                 buyCoffee(amount) {
                     this.triggerPayment(amount * 100, "Buy us a Coffee", "Thanks for your support! ☕", () => {
                         App.UI.toast("Thank you for the coffee! ❤️");
                     });
                 },
+
                 triggerPayment(amount, name, desc, successCallback) {
                     if (typeof Razorpay === 'undefined' || !CONFIG.RAZORPAY_KEY) {
                         alert("Payment Config Missing. Simulating success for demo.");
                         successCallback();
                         return;
                     }
-                    const options = { key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR", name: name, description: desc, handler: function (response) { successCallback(); } };
+                    const options = {
+                        key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR",
+                        name: name, description: desc,
+                        handler: function (response) { successCallback(); }
+                    };
                     const rzp = new Razorpay(options);
                     rzp.open();
                 }
@@ -762,6 +810,7 @@
                     bgMusic.volume = 0.4;
                     bgMusic.play().catch(() => console.log('Autoplay blocked'));
                 },
+
                 stopAll() {
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
@@ -769,6 +818,7 @@
                     cheer.pause(); cheer.currentTime = 0;
                     this.stopMic();
                 },
+
                 async initMic(onBlow) {
                     try {
                         App.State.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -781,6 +831,7 @@
                         const bufferLength = App.State.analyser.frequencyBinCount;
                         const dataArray = new Uint8Array(bufferLength);
 
+                        // Visual Indicator
                         const btn = document.getElementById('mic-btn');
                         if (btn) {
                             btn.innerHTML = '<i class="fas fa-microphone-lines fa-beat"></i> Listening...';
@@ -791,10 +842,17 @@
                         const detectBlow = () => {
                             if (!App.State.audioContext) return;
                             App.State.analyser.getByteFrequencyData(dataArray);
+
                             let sum = 0;
                             for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
                             const average = sum / bufferLength;
-                            if (average > 40) { onBlow(); this.stopMic(); } else { requestAnimationFrame(detectBlow); }
+
+                            if (average > 40) { // Threshold adjusted to match script.js
+                                onBlow();
+                                this.stopMic();
+                            } else {
+                                requestAnimationFrame(detectBlow);
+                            }
                         };
                         detectBlow();
                         App.UI.toast("Microphone Active! Blow on the screen 💨");
@@ -803,6 +861,7 @@
                         App.UI.toast("Microphone denied. Tap the cake instead.", "error");
                     }
                 },
+
                 stopMic() {
                     if (App.State.mediaStream) {
                         App.State.mediaStream.getTracks().forEach(track => track.stop());
@@ -812,6 +871,8 @@
                         App.State.audioContext.close();
                         App.State.audioContext = null;
                     }
+
+                    // Reset Button UI
                     const btn = document.getElementById('mic-btn');
                     if (btn) {
                         btn.innerHTML = '<i class="fas fa-microphone"></i> Enable Mic';
@@ -826,18 +887,24 @@
                     window.addEventListener('hashchange', this.handleRoute.bind(this));
                     window.addEventListener('load', this.handleRoute.bind(this));
                 },
+
                 go(route) { window.location.hash = `#${route}`; },
+
                 handleRoute() {
                     App.Audio.stopAll();
+
                     const hash = window.location.hash.slice(1) || 'home';
                     const [route, param] = hash.split('/');
+
                     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+
                     const activeView = document.getElementById(`view-${route}`);
                     if (activeView) {
                         activeView.classList.remove('hidden');
                         activeView.classList.add('animate-fade-in');
                         window.scrollTo(0, 0);
                     }
+
                     if (route === 'dashboard') App.Controllers.loadDashboard();
                     if (route === 'create') App.UI.renderThemes();
                     if (route === 'wish' && param) App.Controllers.loadWish(param);
@@ -857,6 +924,7 @@
                         container.innerHTML = `<button onclick="App.Router.go('login')" class="text-brand-navy hover:text-brand-pink transition font-bold">Login</button>`;
                     }
                 },
+
                 selectTheme(id, isPremium) {
                     if (isPremium && !App.State.isPremium) {
                         App.UI.toast("This theme requires Premium upgrade 👑", "error");
@@ -865,6 +933,7 @@
                     App.State.currentTheme = id;
                     App.UI.renderThemes();
                 },
+
                 async handleCreate(e) {
                     e.preventDefault();
                     if (!App.State.user) {
@@ -873,34 +942,47 @@
                         App.Router.go('login');
                         return;
                     }
+
                     const btn = document.getElementById('submit-btn');
                     App.UI.setLoading(btn, true, "Wrapping Gift...");
+
                     try {
                         const fileInput = document.getElementById('image-upload');
                         let imgUrl = null;
+
                         if (fileInput.files.length) {
                             App.UI.setLoading(btn, true, "Uploading Photo...");
                             imgUrl = await App.Services.uploadImage(fileInput.files[0]);
                         }
+
                         App.UI.setLoading(btn, true, "Finalizing...");
-                        const { data, error } = await App.Services.supabase.from('wishes').insert([{
-                            recipient_name: document.getElementById('recipient').value,
-                            message: document.getElementById('message').value,
-                            theme: App.State.currentTheme,
-                            image_url: imgUrl,
-                            creator_id: App.State.user.id
-                        }]).select().single();
+
+                        const { data, error } = await App.Services.supabase
+                            .from('wishes')
+                            .insert([{
+                                recipient_name: document.getElementById('recipient').value,
+                                message: document.getElementById('message').value,
+                                theme: App.State.currentTheme,
+                                image_url: imgUrl,
+                                creator_id: App.State.user.id
+                            }])
+                            .select()
+                            .single();
+
                         if (error) throw error;
+
                         App.Controllers.showShareModal(data.id);
                         document.getElementById('create-form').reset();
                         App.State.currentTheme = 'classic';
                         App.UI.renderThemes();
+
                     } catch (err) {
                         App.UI.toast(err.message || "Something went wrong", "error");
                     } finally {
                         App.UI.setLoading(btn, false);
                     }
                 },
+
                 showShareModal(id) {
                     const url = `${window.location.origin}/#wish/${id}`;
                     const modal = document.createElement('div');
@@ -922,17 +1004,24 @@
                     `;
                     document.body.appendChild(modal);
                 },
+
                 async loadDashboard() {
                     if (!App.State.user) return App.Router.go('login');
+
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
+
                     const banner = document.getElementById('premium-banner');
                     if (banner && !App.State.isPremium) banner.classList.remove('hidden');
-                    const { data, error } = await App.Services.supabase.from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
+
+                    const { data, error } = await App.Services.supabase
+                        .from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
+
                     if (!data || data.length === 0) {
                         list.innerHTML = `<div class="text-center py-10 border-2 border-dashed rounded-xl bg-gray-50 text-gray-400">No wishes yet. Create one!</div>`;
                         return;
                     }
+
                     list.innerHTML = data.map(w => `
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition">
                             <div class="flex items-center gap-4">
@@ -946,20 +1035,28 @@
                         </div>
                     `).join('');
                 },
+
                 async deleteWish(id) {
                     if (!confirm("Delete this wish?")) return;
                     await App.Services.supabase.from('wishes').delete().eq('id', id);
                     this.loadDashboard();
                     App.UI.toast("Wish deleted");
                 },
+
                 async loadWish(id) {
                     const container = document.getElementById('wish-content');
                     container.innerHTML = '<div class="text-white flex flex-col items-center gap-4"><i class="fas fa-birthday-cake fa-bounce text-5xl"></i><p>Baking the cake...</p></div>';
+
                     const { data, error } = await App.Services.supabase.from('wishes').select('*').eq('id', id).single();
-                    if (error || !data) { container.innerHTML = '<div class="text-white text-xl">Wish not found 😢</div>'; return; }
+
+                    if (error || !data) {
+                        container.innerHTML = '<div class="text-white text-xl">Wish not found 😢</div>';
+                        return;
+                    }
 
                     const view = document.getElementById('view-wish');
                     view.className = "view-section min-h-screen w-full relative overflow-hidden flex flex-col items-center justify-center";
+
                     if (data.theme === 'love') view.classList.add('bg-love');
                     else if (data.theme === 'midnight') view.classList.add('bg-midnight');
                     else {
@@ -969,11 +1066,14 @@
                         grad.split(' ').forEach(c => view.classList.add(c));
                     }
 
-                    // Cake Selection Logic
-                    let cakeSVG = CakeFactory.getSimpleCake(); // Default for free
-                    if (data.theme === 'love' || data.theme === 'midnight') {
-                        // Premium Cake for premium themes
-                        cakeSVG = data.theme === 'midnight' ? CakeFactory.getMidnightCake() : CakeFactory.getPremiumCake();
+                    // Cake Selection Logic based on Theme
+                    let cakeSVG;
+                    switch (data.theme) {
+                        case 'love': cakeSVG = CakeFactory.getRedVelvetCake(); break;
+                        case 'midnight': cakeSVG = CakeFactory.getChocolateCake(); break;
+                        case 'sunshine': cakeSVG = CakeFactory.getCarrotCake(); break;
+                        case 'ocean': cakeSVG = CakeFactory.getBerryCake(); break;
+                        default: cakeSVG = CakeFactory.getSimpleCake(); break;
                     }
 
                     let particles = '';
@@ -987,13 +1087,18 @@
 
                     container.innerHTML = `
                         ${particles}
+                        
                         <div id="phase-1" class="text-center z-20 transition-all duration-700 flex flex-col items-center">
                             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive animate-slide-up">
                                 Happy Birthday <br> <span class="text-yellow-300">${data.recipient_name}</span>!
                             </h1>
+                            
+                            <!-- DYNAMIC SVG CAKE -->
                             <div class="relative cursor-pointer hover:scale-105 transition duration-300 inline-block mt-8 animate-bounce-in" onclick="App.Controllers.blowCandle()">
                                 ${cakeSVG}
                             </div>
+
+                            <!-- CONTROLS -->
                             <div class="mt-8 flex flex-wrap justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
                                 <button id="mic-btn" onclick="App.Audio.initMic(App.Controllers.blowCandle)" class="bg-white text-brand-navy px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2 border-2 border-transparent">
                                     <i class="fas fa-microphone"></i> Enable Mic to Blow
@@ -1003,6 +1108,8 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Phase 2: Card -->
                         <div id="phase-2" class="hidden opacity-0 transform translate-y-10 transition-all duration-1000 z-20 max-w-lg w-full px-4">
                             <div class="${cardClass} backdrop-blur-xl rounded-3xl p-8 shadow-2xl border relative text-center">
                                 ${data.image_url ? `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white shadow-lg">` : ''}
@@ -1014,37 +1121,57 @@
                             </div>
                         </div>
                     `;
-                    const playMusic = () => { App.Audio.startMusic(); document.body.removeEventListener('click', playMusic); document.body.removeEventListener('touchstart', playMusic); };
+
+                    const playMusic = () => {
+                        App.Audio.startMusic();
+                        document.body.removeEventListener('click', playMusic);
+                        document.body.removeEventListener('touchstart', playMusic);
+                    };
                     document.body.addEventListener('click', playMusic);
                     document.body.addEventListener('touchstart', playMusic);
                 },
+
                 blowCandle() {
                     const flames = document.querySelectorAll('.flame');
                     if (flames.length === 0 || flames[0].classList.contains('hidden')) return;
+
+                    // Apply the 'flame-out' class
                     flames.forEach(flame => flame.classList.add('flame-out'));
+
+                    // Stop Mic Immediately
                     App.Audio.stopMic();
+
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
                     bg.pause();
                     cheer.play();
+
                     App.Controllers.startConfetti();
+
+                    // Wait for flame animation (300ms) then switch phase
                     setTimeout(() => {
                         const p1 = document.getElementById('phase-1');
                         const p2 = document.getElementById('phase-2');
+
                         p1.style.opacity = '0';
                         p1.style.transform = 'scale(0.9)';
+
                         setTimeout(() => {
                             p1.classList.add('hidden');
                             p2.classList.remove('hidden');
-                            requestAnimationFrame(() => { p2.classList.remove('opacity-0', 'translate-y-10'); });
+                            requestAnimationFrame(() => {
+                                p2.classList.remove('opacity-0', 'translate-y-10');
+                            });
                         }, 600);
                     }, 300);
                 },
+
                 startConfetti() {
                     const canvas = document.getElementById('confetti-canvas');
                     const ctx = canvas.getContext('2d');
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
+
                     const particles = Array.from({ length: 150 }, () => ({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height - canvas.height,
@@ -1053,6 +1180,7 @@
                         speedY: Math.random() * 3 + 2,
                         speedX: Math.random() * 2 - 1
                     }));
+
                     function loop() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         particles.forEach(p => {
