@@ -516,7 +516,7 @@
     <script>
         // --- CAKE REGISTRY ---
         const CakeFactory = {
-            // Standard Interactive Candle Group (Scaled & Positioned for these cakes)
+            // Reusable Candle Group (Scaled & Positioned for 300x400 viewbox)
             getCandles(x, y) {
                 return `
                     <g transform="translate(${x}, ${y}) scale(0.3)">
@@ -532,7 +532,7 @@
                 `;
             },
 
-            // 1. Simple Vector Cake (Classic)
+            // 1. Classic Cake (Simple Vector)
             getSimpleCake() {
                 return `
                     <svg width="300" height="300" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -547,7 +547,7 @@
                 `;
             },
 
-            // 2. Carrot Cake (Sunshine) - Fixed SVG from Prompt
+            // 2. Carrot Cake (Sunshine)
             getCarrotCake() {
                 return `
                     <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -597,6 +597,7 @@
                             <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#sponge-grad)" />
                             <path d="M 95 215 C 95 230, 205 230, 205 215 L 205 205 C 205 220, 95 220, 95 205 Z" fill="url(#crumb-texture)" />
                         </g>
+                        <!-- Candles Overlay -->
                         ${this.getCandles(150, 185)}
                         ${this.getCandles(120, 190)}
                         ${this.getCandles(180, 190)}
@@ -604,7 +605,7 @@
                 `;
             },
 
-            // 3. White Berry Drip (Ocean) - Fixed SVG from Prompt
+            // 3. White Berry Drip (Ocean)
             getBerryCake() {
                 return `
                     <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -662,7 +663,7 @@
                 `;
             },
 
-            // 4. Red Velvet (Love - Premium) - Fixed SVG from Prompt
+            // 4. Red Velvet (Love)
             getRedVelvetCake() {
                 return `
                     <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -713,7 +714,7 @@
                 `;
             },
 
-            // 5. Dark Chocolate (Midnight - Premium) - Fixed SVG from Prompt
+            // 5. Dark Chocolate (Midnight)
             getChocolateCake() {
                 return `
                     <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -838,6 +839,8 @@
                             <use href="#single-cherry" x="265" y="205" />
                         </g>
                         ${this.getCandles(175, 220)}
+                        ${this.getCandles(125, 230)}
+                        ${this.getCandles(225, 230)}
                     </svg>
                 `;
             }
