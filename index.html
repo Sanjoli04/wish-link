@@ -30,6 +30,7 @@
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -139,35 +140,36 @@
             display: flex;
         }
 
-        /* Candle Flame Physics */
-        .flame {
+        /* Real Flame Animation for SVG */
+        .flame-real {
             transform-origin: center bottom;
-            animation: flicker 3ms ease-in infinite alternate, move 3s infinite linear;
+            animation: flameWaver 3s ease-in-out infinite alternate;
         }
 
-        @keyframes flicker {
+        .flame-inner {
+            animation: flameFlicker 0.1s ease-in-out infinite alternate;
+            transform-origin: center bottom;
+        }
+
+        @keyframes flameWaver {
+            0% {
+                transform: rotate(-2deg);
+            }
+
+            100% {
+                transform: rotate(2deg);
+            }
+        }
+
+        @keyframes flameFlicker {
             0% {
                 transform: scale(1);
                 opacity: 0.9;
             }
 
             100% {
-                transform: scale(1.1);
+                transform: scale(1.05);
                 opacity: 1;
-            }
-        }
-
-        @keyframes move {
-            0% {
-                transform: skewX(2deg);
-            }
-
-            50% {
-                transform: skewX(-2deg);
-            }
-
-            100% {
-                transform: skewX(2deg);
             }
         }
 
@@ -248,22 +250,14 @@
                         class="text-brand-pink">.app</span></span>
             </a>
             <div class="flex items-center gap-3 md:gap-6 text-sm font-semibold">
-                <!-- Action Button -->
                 <a href="#create"
                     class="px-4 py-2 bg-white border border-brand-pink text-brand-pink rounded-full hover:bg-pink-50 transition shadow-sm text-xs md:text-sm whitespace-nowrap gap-2 flex items-center">
                     <i class="fas fa-wand-magic-sparkles"></i> Gift Wish
                 </a>
-
-                <!-- Coffee Button -->
                 <button onclick="App.Services.buyCoffee(50)"
-                    class="text-brand-navy hover:text-brand-pink transition px-2 text-lg" title="Buy us a Coffee">
-                    <i class="fas fa-coffee"></i>
-                </button>
-
-                <!-- Auth State Controlled by JS -->
-                <div id="nav-auth-container" class="flex items-center gap-4">
-                    <!-- Injected by JS -->
-                </div>
+                    class="text-brand-navy hover:text-brand-pink transition px-2 text-lg" title="Buy us a Coffee"><i
+                        class="fas fa-coffee"></i></button>
+                <div id="nav-auth-container" class="flex items-center gap-4"></div>
             </div>
         </div>
     </nav>
@@ -273,6 +267,7 @@
 
         <!-- VIEW: HOME -->
         <div id="view-home" class="view-section hidden">
+            <!-- Hero -->
             <section class="bg-gradient-to-b from-purple-50 via-white to-white pt-24 pb-20 px-4 text-center">
                 <span
                     class="px-4 py-1.5 bg-pink-100 text-brand-pink rounded-full text-[10px] md:text-xs font-bold tracking-wider uppercase mb-6 inline-block shadow-sm animate-slide-up">100%
@@ -313,6 +308,57 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Testimonials (Restored) -->
+            <section class="py-20 bg-white border-t border-gray-100">
+                <div class="max-w-6xl mx-auto px-4">
+                    <h2 class="text-3xl font-extrabold text-center text-brand-navy mb-12">Wall of Love 💖</h2>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="bg-brand-bg p-8 rounded-2xl relative">
+                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
+                            <p class="text-gray-600 mb-6 italic relative z-10">"My best friend literally cried when she
+                                blew out the candle on her phone. Best digital gift ever!"</p>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center font-bold text-purple-700">
+                                    S</div>
+                                <div>
+                                    <div class="font-bold text-brand-navy text-sm">Sarah Jenkins</div>
+                                    <div class="text-xs text-gray-400">Created 3 wishes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-brand-bg p-8 rounded-2xl relative">
+                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
+                            <p class="text-gray-600 mb-6 italic relative z-10">"I forgot my sister's birthday and made
+                                this in the Uber. She loved it more than the actual gift lol."</p>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center font-bold text-blue-700">
+                                    M</div>
+                                <div>
+                                    <div class="font-bold text-brand-navy text-sm">Mike T.</div>
+                                    <div class="text-xs text-gray-400">Saved by WishLink</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-brand-bg p-8 rounded-2xl relative">
+                            <div class="text-4xl text-brand-pink opacity-20 absolute top-4 left-4">❝</div>
+                            <p class="text-gray-600 mb-6 italic relative z-10">"The design is so cute and the animations
+                                are buttery smooth. Feels very premium for a free tool."</p>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 bg-pink-200 rounded-full flex items-center justify-center font-bold text-pink-700">
+                                    A</div>
+                                <div>
+                                    <div class="font-bold text-brand-navy text-sm">Ananya G.</div>
+                                    <div class="text-xs text-gray-400">Super Fan</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- VIEW: LOGIN -->
@@ -344,7 +390,6 @@
                     class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition"><i
                         class="fas fa-plus"></i> New Wish</a>
             </div>
-
             <!-- Premium Banner -->
             <div id="premium-banner"
                 class="hidden bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
@@ -356,10 +401,7 @@
                 <button onclick="App.Services.buyPremium()"
                     class="bg-white text-orange-500 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-50 shadow-sm transition">Upgrade</button>
             </div>
-
-            <div id="my-wishes-list" class="grid gap-4">
-                <!-- Injected via JS -->
-            </div>
+            <div id="my-wishes-list" class="grid gap-4"></div>
         </div>
 
         <!-- VIEW: CREATE -->
@@ -377,16 +419,10 @@
                         <textarea id="message" required rows="4" placeholder="Write something sweet..."
                             class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-pink outline-none transition"></textarea>
                     </div>
-
-                    <!-- Theme Selector -->
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-4 ml-1">Choose a Theme</label>
-                        <div class="grid grid-cols-3 gap-4" id="theme-selector">
-                            <!-- Themes injected by JS to reduce HTML bloat -->
-                        </div>
+                        <div class="grid grid-cols-3 gap-4" id="theme-selector"></div>
                     </div>
-
-                    <!-- Image Upload -->
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Add a Photo (Optional)</label>
                         <div class="relative group cursor-pointer">
@@ -401,7 +437,6 @@
                             </div>
                         </div>
                     </div>
-
                     <button type="submit" id="submit-btn"
                         class="w-full py-4 btn-gift text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 mt-4">Gift
                         this Wish 🎁</button>
@@ -412,33 +447,55 @@
         <!-- VIEW: WISH (PUBLIC) -->
         <div id="view-wish" class="view-section hidden min-h-screen bg-gray-900 w-full relative overflow-hidden">
             <div id="wish-content"
-                class="relative z-10 w-full h-full min-h-screen flex flex-col items-center justify-center">
-                <!-- Dynamic Content -->
-            </div>
-            <!-- Canvas for Confetti -->
+                class="relative z-10 w-full h-full min-h-screen flex flex-col items-center justify-center"></div>
             <canvas id="confetti-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
-            <!-- Watermark -->
             <a href="#home"
                 class="fixed bottom-4 right-4 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white text-xs font-bold hover:bg-white/40 transition z-50 flex items-center gap-2">
                 <span>Made with</span> <span class="font-cursive text-sm">WishLink</span>
             </a>
         </div>
 
-        <!-- VIEW: BLOG (Placeholder) -->
+        <!-- VIEW: BLOG -->
         <div id="view-blog" class="view-section hidden max-w-4xl mx-auto px-4 py-10">
             <h2 class="text-3xl font-bold text-brand-navy mb-8">Birthday Ideas & Tips 💡</h2>
-            <p class="text-gray-500">Coming soon...</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <article
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition duration-300 group cursor-pointer">
+                    <div
+                        class="h-48 bg-purple-50 flex items-center justify-center text-brand-pink text-6xl group-hover:scale-110 transition duration-500">
+                        🎂</div>
+                    <div class="p-8">
+                        <h3 class="font-bold text-xl mb-3 text-brand-navy group-hover:text-brand-pink transition">10
+                            Best Messages for Best Friends</h3>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">Struggling to find the right words? Here
+                            are the funniest and sweetest birthday wishes to steal.</p>
+                        <span class="text-brand-pink font-bold text-sm">Read Article -></span>
+                    </div>
+                </article>
+                <article
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition duration-300 group cursor-pointer">
+                    <div
+                        class="h-48 bg-pink-50 flex items-center justify-center text-brand-pink text-6xl group-hover:scale-110 transition duration-500">
+                        🎁</div>
+                    <div class="p-8">
+                        <h3 class="font-bold text-xl mb-3 text-brand-navy group-hover:text-brand-pink transition">Last
+                            Minute Digital Gift Ideas</h3>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">Forgot a gift? Don't worry. Create a
+                            WishLink and pair it with these instant digital vouchers.</p>
+                        <span class="text-brand-pink font-bold text-sm">Read Article -></span>
+                    </div>
+                </article>
+            </div>
         </div>
     </main>
 
-    <!-- FOOTER RESTORED -->
+    <!-- FOOTER -->
     <footer class="bg-gray-900 text-gray-400 py-10 text-center border-t border-gray-800 z-10 relative">
         <div class="flex items-center justify-center gap-2 mb-6">
             <img src="logo.png" onerror="this.src='https://placehold.co/20'" alt="Logo"
                 class="h-6 w-auto brightness-0 invert">
             <span class="font-bold text-white tracking-wide">WishLink</span>
         </div>
-
         <div class="flex justify-center gap-6 text-sm font-medium mb-6">
             <button class="hover:text-white transition text-gray-400 hover:scale-105"
                 onclick="App.Services.buyCoffee(50)">Buy us a Coffee ☕</button>
@@ -458,7 +515,6 @@
 
     <!-- APP LOGIC -->
     <script>
-        // --- APP NAMESPACE ---
         const App = {
             State: {
                 user: null,
@@ -470,7 +526,6 @@
                 isBlowing: false
             },
 
-            // --- UI UTILS & TOASTS ---
             UI: {
                 toast(msg, type = 'success') {
                     const container = document.getElementById('toast-container');
@@ -479,11 +534,7 @@
                     const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
                     el.innerHTML = `<i class="fas ${icon} text-lg"></i><span>${msg}</span>`;
                     container.appendChild(el);
-
-                    // Animate In
                     requestAnimationFrame(() => el.classList.add('show'));
-
-                    // Remove
                     setTimeout(() => {
                         el.classList.remove('show');
                         setTimeout(() => el.remove(), 400);
@@ -527,7 +578,6 @@
                 }
             },
 
-            // --- SERVICES (Supabase, Uploads) ---
             Services: {
                 supabase: null,
 
@@ -538,13 +588,10 @@
                     }
                     this.supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-                    // Auth Listener
                     this.supabase.auth.onAuthStateChange((event, session) => {
                         App.State.user = session?.user || null;
                         App.Controllers.updateNav();
                         App.Services.checkPremium();
-
-                        // Handle Login Redirect
                         if (App.State.user && window.location.hash === '#login') {
                             const returnTo = sessionStorage.getItem('return_to') || 'dashboard';
                             sessionStorage.removeItem('return_to');
@@ -571,7 +618,6 @@
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('upload_preset', CONFIG.CLOUDINARY_PRESET);
-
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
                     if (!res.ok) throw new Error('Upload failed');
                     const data = await res.json();
@@ -582,7 +628,6 @@
                     if (!App.State.user) return;
                     const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
                     App.State.isPremium = isPrem;
-                    // Update UI
                     if (isPrem) {
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
                         const banner = document.getElementById('premium-banner');
@@ -620,7 +665,6 @@
                 }
             },
 
-            // --- AUDIO & MIC ENGINE (The Upgrade) ---
             Audio: {
                 startMusic() {
                     const bgMusic = document.getElementById('bg-music');
@@ -648,16 +692,23 @@
                         const bufferLength = App.State.analyser.frequencyBinCount;
                         const dataArray = new Uint8Array(bufferLength);
 
+                        // Visual Indicator
+                        const btn = document.getElementById('mic-btn');
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-microphone-lines fa-beat"></i> Listening...';
+                            btn.classList.remove('bg-white', 'text-brand-navy');
+                            btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                        }
+
                         const detectBlow = () => {
                             if (!App.State.audioContext) return;
                             App.State.analyser.getByteFrequencyData(dataArray);
 
-                            // Blow detection logic: High energy in low frequencies
                             let sum = 0;
                             for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
                             const average = sum / bufferLength;
 
-                            if (average > 50) { // Threshold
+                            if (average > 50) {
                                 onBlow();
                                 this.stopMic();
                             } else {
@@ -665,10 +716,10 @@
                             }
                         };
                         detectBlow();
-                        App.UI.toast("Microphone Active! Blow on the screen 🎂");
+                        App.UI.toast("Blow on your screen! 🎂");
                     } catch (err) {
                         console.error("Mic error", err);
-                        App.UI.toast("Microphone access denied. Tap the candle instead.", "error");
+                        App.UI.toast("Microphone denied. Tap the cake instead.", "error");
                     }
                 },
 
@@ -677,28 +728,29 @@
                         App.State.audioContext.close();
                         App.State.audioContext = null;
                     }
+                    if (App.State.microphone) {
+                        App.State.microphone.disconnect();
+                        App.State.microphone = null;
+                    }
                 }
             },
 
-            // --- ROUTER (The Fix) ---
             Router: {
                 init() {
                     window.addEventListener('hashchange', this.handleRoute.bind(this));
-                    window.addEventListener('load', this.handleRoute.bind(this)); // Fix refresh issue
+                    window.addEventListener('load', this.handleRoute.bind(this));
                 },
 
                 go(route) { window.location.hash = `#${route}`; },
 
                 handleRoute() {
-                    App.Audio.stopAll(); // Cleanup audio on nav
+                    App.Audio.stopAll();
 
                     const hash = window.location.hash.slice(1) || 'home';
                     const [route, param] = hash.split('/');
 
-                    // Hide all views
                     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
 
-                    // Show active view
                     const activeView = document.getElementById(`view-${route}`);
                     if (activeView) {
                         activeView.classList.remove('hidden');
@@ -706,7 +758,6 @@
                         window.scrollTo(0, 0);
                     }
 
-                    // Route Logic
                     if (route === 'dashboard') App.Controllers.loadDashboard();
                     if (route === 'create') App.UI.renderThemes();
                     if (route === 'wish' && param) App.Controllers.loadWish(param);
@@ -714,7 +765,6 @@
                 }
             },
 
-            // --- CONTROLLERS (Business Logic) ---
             Controllers: {
                 updateNav() {
                     const container = document.getElementById('nav-auth-container');
@@ -774,7 +824,6 @@
 
                         if (error) throw error;
 
-                        // Show Success Modal
                         App.Controllers.showShareModal(data.id);
                         document.getElementById('create-form').reset();
                         App.State.currentTheme = 'classic';
@@ -815,7 +864,6 @@
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
 
-                    // Check banner
                     const banner = document.getElementById('premium-banner');
                     if (banner && !App.State.isPremium) banner.classList.remove('hidden');
 
@@ -859,9 +907,8 @@
                         return;
                     }
 
-                    // Apply Theme Background
                     const view = document.getElementById('view-wish');
-                    view.className = "view-section min-h-screen w-full relative overflow-hidden flex flex-col items-center justify-center"; // Reset
+                    view.className = "view-section min-h-screen w-full relative overflow-hidden flex flex-col items-center justify-center";
 
                     if (data.theme === 'love') view.classList.add('bg-love');
                     else if (data.theme === 'midnight') view.classList.add('bg-midnight');
@@ -872,7 +919,6 @@
                         grad.split(' ').forEach(c => view.classList.add(c));
                     }
 
-                    // Generate Particles
                     let particles = '';
                     if (data.theme === 'love') {
                         for (let i = 0; i < 6; i++) particles += `<div class="floating-heart text-white/30 text-4xl" style="left:${Math.random() * 100}%; animation-delay:${Math.random() * 5}s">❤️</div>`;
@@ -885,23 +931,51 @@
                     container.innerHTML = `
                         ${particles}
                         
-                        <!-- Phase 1: Cake -->
-                        <div id="phase-1" class="text-center z-20 transition-all duration-700">
-                            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive">
+                        <div id="phase-1" class="text-center z-20 transition-all duration-700 flex flex-col items-center">
+                            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-8 drop-shadow-lg font-cursive animate-slide-up">
                                 Happy Birthday <br> <span class="text-yellow-300">${data.recipient_name}</span>!
                             </h1>
-                            <div class="relative cursor-pointer hover:scale-105 transition duration-300 inline-block mt-8" onclick="App.Controllers.blowCandle()">
-                                <div class="text-[150px] leading-none relative">
-                                    🎂
-                                    <div id="flame" class="absolute top-[-20px] left-[50%] transform -translate-x-1/2 text-5xl flame">🔥</div>
-                                </div>
-                                <div class="mt-8 bg-black/30 backdrop-blur-md text-white px-6 py-2 rounded-full text-sm font-bold animate-pulse">
-                                    🎤 Blow into mic OR 👇 Tap to wish
-                                </div>
+                            
+                            <!-- REALISTIC SVG CAKE -->
+                            <div class="relative cursor-pointer hover:scale-105 transition duration-300 inline-block mt-8 animate-bounce-in" onclick="App.Controllers.blowCandle()">
+                                <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Plate -->
+                                    <ellipse cx="100" cy="170" rx="90" ry="15" fill="#f0f0f0" />
+                                    <ellipse cx="100" cy="168" rx="90" ry="15" fill="#e0e0e0" />
+                                    
+                                    <!-- Cake Base -->
+                                    <path d="M40 110 L40 150 C40 165 160 165 160 150 L160 110" fill="#8B4513" />
+                                    <ellipse cx="100" cy="110" rx="60" ry="20" fill="#A0522D" />
+                                    
+                                    <!-- Frosting/Icing -->
+                                    <path d="M38 110 C38 110 50 130 70 115 C90 100 110 130 130 115 C150 100 162 110 162 110 L162 100 C162 100 100 80 38 100 Z" fill="#FFC0CB" />
+                                    <ellipse cx="100" cy="100" rx="62" ry="22" fill="#FFB6C1" />
+                                    
+                                    <!-- Candle -->
+                                    <rect x="92" y="60" width="16" height="50" rx="2" fill="#F44336" />
+                                    <path d="M92 70 L108 65" stroke="white" stroke-width="2" stroke-opacity="0.5" />
+                                    <path d="M92 85 L108 80" stroke="white" stroke-width="2" stroke-opacity="0.5" />
+                                    
+                                    <!-- Flame -->
+                                    <g id="flame" class="flame-real">
+                                        <path d="M100 60 Q105 50 100 25 Q95 50 100 60" fill="#FFD700" />
+                                        <path d="M100 55 Q103 48 100 35 Q97 48 100 55" fill="#FFA500" class="flame-inner" />
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- CONTROLS -->
+                            <div class="mt-8 flex gap-4 animate-slide-up" style="animation-delay: 0.2s">
+                                <button id="mic-btn" onclick="App.Audio.initMic(App.Controllers.blowCandle)" class="bg-white text-brand-navy px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2 border-2 border-transparent">
+                                    <i class="fas fa-microphone"></i> Enable Mic to Blow
+                                </button>
+                                <button onclick="App.Controllers.blowCandle()" class="bg-white/20 text-white backdrop-blur-sm px-6 py-3 rounded-full font-bold shadow-lg hover:bg-white/30 transition border border-white/40">
+                                    👇 Tap to Wish
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Phase 2: Card (Hidden) -->
+                        <!-- Phase 2: Card -->
                         <div id="phase-2" class="hidden opacity-0 transform translate-y-10 transition-all duration-1000 z-20 max-w-lg w-full px-4">
                             <div class="${cardClass} backdrop-blur-xl rounded-3xl p-8 shadow-2xl border relative text-center">
                                 ${data.image_url ? `<img src="${data.image_url}" class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-white shadow-lg">` : ''}
@@ -914,32 +988,27 @@
                         </div>
                     `;
 
-                    // Enable Audio & Mic
-                    document.body.onclick = () => {
+                    // Auto-start music on first click anywhere
+                    document.body.addEventListener('click', function musicStarter() {
                         App.Audio.startMusic();
-                        // Only init mic once
-                        if (!App.State.audioContext) App.Audio.initMic(App.Controllers.blowCandle);
-                        document.body.onclick = null;
-                    };
+                        document.body.removeEventListener('click', musicStarter);
+                    }, { once: true });
                 },
 
                 blowCandle() {
                     const flame = document.getElementById('flame');
                     if (!flame || flame.classList.contains('hidden')) return;
 
-                    // 1. UI Changes
                     flame.classList.add('hidden');
+                    App.Audio.stopMic(); // Important: Kill mic immediately
 
-                    // 2. Audio Effects
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
                     bg.pause();
                     cheer.play();
 
-                    // 3. Confetti
                     App.Controllers.startConfetti();
 
-                    // 4. Phase Transition
                     const p1 = document.getElementById('phase-1');
                     const p2 = document.getElementById('phase-2');
 
@@ -991,7 +1060,6 @@
             App.Services.init();
             App.Router.init();
 
-            // File input preview
             const fileInput = document.getElementById('image-upload');
             if (fileInput) {
                 fileInput.onchange = (e) => {
@@ -1001,11 +1069,9 @@
                 };
             }
 
-            // Create Form
             const form = document.getElementById('create-form');
             if (form) form.addEventListener('submit', App.Controllers.handleCreate);
         });
-
     </script>
 </body>
 
