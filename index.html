@@ -391,7 +391,7 @@
             </div>
             <!-- Premium Banner -->
             <div id="premium-banner"
-                class="hidden bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
+                class="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg">
                 <div>
                     <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-crown text-yellow-100"></i>
                         Go Premium</h3>
@@ -714,7 +714,7 @@
                 `;
             },
 
-            // 5. Dark Chocolate (Midnight)
+            // 5. Dark Chocolate (Midnight) - The Requested Fix
             getChocolateCake() {
                 return `
                     <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -839,6 +839,8 @@
                             <use href="#single-cherry" x="265" y="205" />
                         </g>
                         ${this.getCandles(175, 220)}
+                        ${this.getCandles(125, 230)}
+                        ${this.getCandles(225, 230)}
                     </svg>
                 `;
             }
@@ -921,7 +923,7 @@
                     this.supabase.auth.onAuthStateChange((event, session) => {
                         App.State.user = session?.user || null;
                         App.Controllers.updateNav();
-                        App.Services.checkPremium();
+                        App.Services.checkPremium(); // Call immediately when auth changes
                         if (App.State.user && window.location.hash === '#login') {
                             const returnTo = sessionStorage.getItem('return_to') || 'dashboard';
                             sessionStorage.removeItem('return_to');
@@ -958,18 +960,31 @@
                     if (!App.State.user) return;
                     const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
                     App.State.isPremium = isPrem;
-                    // Ensure correct logic for premium users
+
+                    // --- KEY FIX: Force UI Update Immediately ---
                     if (isPrem) {
+                        // Hide all locks immediately
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
+
+                        // Hide banner if it exists in DOM
                         const banner = document.getElementById('premium-banner');
                         if (banner) banner.classList.add('hidden');
+
+                        // Re-render themes if on Create page to remove locks
+                        if (window.location.hash === '#create') {
+                            App.UI.renderThemes();
+                        }
                     }
                 },
 
                 buyPremium() {
                     this.triggerPayment(4900, "WishLink Premium", "Unlock all themes", () => {
                         App.UI.toast("Payment Successful! Premium Unlocked 👑");
-                        localStorage.setItem(`premium_${App.State.user.id}`, 'true');
+                        // Set local storage
+                        if (App.State.user) {
+                            localStorage.setItem(`premium_${App.State.user.id}`, 'true');
+                        }
+                        // Force re-check
                         App.Services.checkPremium();
                     });
                 },
@@ -1098,7 +1113,10 @@
                     }
 
                     if (route === 'dashboard') App.Controllers.loadDashboard();
-                    if (route === 'create') App.UI.renderThemes();
+                    if (route === 'create') {
+                        App.UI.renderThemes();
+                        App.Services.checkPremium(); // Re-check premium on create page load
+                    }
                     if (route === 'wish' && param) App.Controllers.loadWish(param);
                     if (route === 'login' && App.State.user) this.go('dashboard');
                 }
@@ -1118,6 +1136,11 @@
                 },
 
                 selectTheme(id, isPremium) {
+                    // Re-check state to be sure
+                    if (App.State.user && localStorage.getItem(`premium_${App.State.user.id}`) === 'true') {
+                        App.State.isPremium = true;
+                    }
+
                     if (isPremium && !App.State.isPremium) {
                         App.UI.toast("This theme requires Premium upgrade 👑", "error");
                         return;
@@ -1203,7 +1226,7 @@
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
 
-                    // Initial check for banner visibility
+                    // Force Premium Check on load
                     App.Services.checkPremium();
 
                     const { data, error } = await App.Services.supabase
