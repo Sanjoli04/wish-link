@@ -839,8 +839,6 @@
                             <use href="#single-cherry" x="265" y="205" />
                         </g>
                         ${this.getCandles(175, 220)}
-                        ${this.getCandles(125, 230)}
-                        ${this.getCandles(225, 230)}
                     </svg>
                 `;
             }
@@ -960,6 +958,7 @@
                     if (!App.State.user) return;
                     const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
                     App.State.isPremium = isPrem;
+                    // Ensure correct logic for premium users
                     if (isPrem) {
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
                         const banner = document.getElementById('premium-banner');
@@ -1204,8 +1203,8 @@
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
 
-                    const banner = document.getElementById('premium-banner');
-                    if (banner && !App.State.isPremium) banner.classList.remove('hidden');
+                    // Initial check for banner visibility
+                    App.Services.checkPremium();
 
                     const { data, error } = await App.Services.supabase
                         .from('wishes').select('*').eq('creator_id', App.State.user.id).order('created_at', { ascending: false });
