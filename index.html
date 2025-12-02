@@ -6,13 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WishLink - Create Magic Moments</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
 
-    <!-- Razorpay SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -48,7 +45,6 @@
         }
     </script>
 
-    <!-- Styles -->
     <style>
         :root {
             --color-primary: #FF0055;
@@ -148,7 +144,7 @@
             animation: flicker 0.5s infinite alternate;
         }
 
-        /* --- PREMIUM THEME STYLES (ADDED) --- */
+        /* --- PREMIUM THEME STYLES --- */
 
         /* LOVE THEME */
         .bg-love {
@@ -261,46 +257,38 @@
         }
     </style>
 
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="bg-brand-bg text-gray-800 selection:bg-pink-100 selection:text-brand-pink">
 
-    <!-- 1. LOAD EXTERNAL CONFIG -->
     <script src="config.js"></script>
 
-    <!-- Toast Container -->
     <div id="toast-container"></div>
 
-    <!-- NAVBAR -->
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-40 h-16 transition-all" id="navbar">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-            <a href="#home" class="flex items-center gap-2 group">
+            <a href="/" data-link class="flex items-center gap-2 group">
                 <img src="logo.png" alt="WishLink Logo" class="h-8 w-auto group-hover:scale-105 transition">
                 <span class="text-xl font-bold text-brand-navy tracking-tight hidden md:inline">WishLink<span
                         class="text-brand-pink">.app</span></span>
             </a>
 
             <div class="flex items-center gap-3 md:gap-6 text-sm font-semibold">
-                <!-- Action Buttons -->
-                <a href="create"
+                <a href="/create" data-link
                     class="px-4 py-2 bg-white border border-brand-pink text-brand-pink rounded-full hover:bg-pink-50 transition shadow-sm text-xs md:text-sm whitespace-nowrap gap-2 flex items-center">
                     <i class="fas fa-wand-magic-sparkles"></i> Gift Wish
                 </a>
 
-                <!-- Nav Links -->
                 <button onclick="payForCoffee(50)" class="text-brand-navy hover:text-brand-pink transition px-2 text-lg"
                     title="Buy us a Coffee"><i class="fas fa-coffee"></i></button>
 
-                <!-- Dynamic Auth Buttons -->
-                <button id="nav-login" onclick="window.location.hash='#login'"
+                <button id="nav-login" onclick="navigateTo('/login')"
                     class="text-brand-navy hover:text-brand-pink transition px-2">Login</button>
-                <button id="nav-dash" onclick="window.location.hash='#dashboard'"
+                <button id="nav-dash" onclick="navigateTo('/dashboard')"
                     class="hidden text-brand-navy hover:text-brand-pink transition flex items-center gap-2">
                     <i class="fas fa-user-circle text-lg"></i> <span class="hidden md:inline">Dashboard</span>
                 </button>
@@ -311,12 +299,9 @@
         </div>
     </nav>
 
-    <!-- CONTENT WRAPPER -->
     <main class="pt-16 min-h-screen flex flex-col">
 
-        <!-- VIEW: HOME -->
         <div id="view-home" class="block animate-fade-in">
-            <!-- Hero -->
             <section class="bg-gradient-to-b from-purple-50 via-white to-white pt-24 pb-20 px-4 text-center">
                 <span
                     class="px-4 py-1.5 bg-pink-100 text-brand-pink rounded-full text-[10px] md:text-xs font-bold tracking-wider uppercase mb-6 inline-block shadow-sm animate-slide-up">100%
@@ -336,19 +321,18 @@
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 animate-slide-up"
                     style="animation-delay: 0.3s;">
-                    <button onclick="window.location.hash='#create'"
+                    <button onclick="navigateTo('/create')"
                         class="btn-gift px-8 py-4 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl">
                         Gift this Wish 🎁
                     </button>
-                    <button onclick="window.location.hash='#blog'"
+                    <button onclick="navigateTo('/blog')"
                         class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-bold hover:bg-gray-50 transition active:scale-95 text-lg">
                         Read Ideas
                     </button>
                 </div>
 
-                <!-- Interactive Demo Preview -->
                 <div class="mt-20 max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-[6px] border-white transform -rotate-1 hover:rotate-0 transition duration-700 ease-out cursor-pointer group"
-                    onclick="window.location.hash='#create'">
+                    onclick="navigateTo('/create')">
                     <div class="bg-gray-100 h-10 flex items-center px-4 gap-2 border-b border-gray-200">
                         <div class="w-3 h-3 bg-red-400 rounded-full"></div>
                         <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
@@ -368,13 +352,13 @@
                 </div>
             </section>
 
-            <!-- Features -->
             <section class="py-20 px-4 max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
                 <div
                     class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
                     <div
                         class="w-14 h-14 bg-purple-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-magic"></i></div>
+                        <i class="fas fa-magic"></i>
+                    </div>
                     <h3 class="font-bold text-xl mb-3 text-brand-navy">Interactive Cake</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">They actually have to blow the candle (tap/click)
                         to see your message.</p>
@@ -383,7 +367,8 @@
                     class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
                     <div
                         class="w-14 h-14 bg-pink-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-music"></i></div>
+                        <i class="fas fa-music"></i>
+                    </div>
                     <h3 class="font-bold text-xl mb-3 text-brand-navy">Music & Confetti</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Auto-plays celebration music and showers the screen
                         with digital confetti.</p>
@@ -392,14 +377,14 @@
                     class="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-xl hover:-translate-y-1 transition duration-300">
                     <div
                         class="w-14 h-14 bg-blue-100 text-brand-navy rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fas fa-share-alt"></i></div>
+                        <i class="fas fa-share-alt"></i>
+                    </div>
                     <h3 class="font-bold text-xl mb-3 text-brand-navy">Easy Sharing</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Get a unique link to share on WhatsApp, Instagram,
                         or Messenger instantly.</p>
                 </div>
             </section>
 
-            <!-- Testimonials -->
             <section class="py-20 bg-white border-t border-gray-100">
                 <div class="max-w-6xl mx-auto px-4">
                     <h2 class="text-3xl font-extrabold text-center text-brand-navy mb-12">Wall of Love 💖</h2>
@@ -451,7 +436,6 @@
             </section>
         </div>
 
-        <!-- VIEW: LOGIN -->
         <div id="view-login" class="hidden flex items-center justify-center flex-1 px-4 animate-fade-in bg-gray-50">
             <div
                 class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-10px_rgba(0,35,102,0.1)] max-w-sm w-full text-center border border-gray-100">
@@ -472,20 +456,18 @@
             </div>
         </div>
 
-        <!-- VIEW: DASHBOARD -->
         <div id="view-dashboard" class="hidden max-w-4xl mx-auto px-4 py-10 w-full animate-fade-in">
             <div class="flex justify-between items-end mb-8">
                 <div>
                     <h2 class="text-3xl font-bold text-brand-navy">My Wishes</h2>
                     <p class="text-gray-500 text-sm mt-1">Manage the love you've shared</p>
                 </div>
-                <a href="create"
+                <a href="/create" data-link
                     class="px-5 py-2.5 bg-brand-pink text-white rounded-xl font-bold shadow-md hover:bg-pink-700 text-sm flex items-center gap-2 transition transform hover:-translate-y-0.5">
                     <i class="fas fa-plus"></i> New Wish
                 </a>
             </div>
 
-            <!-- Upgrade Banner -->
             <div id="premium-banner"
                 class="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 rounded-2xl text-white flex justify-between items-center mb-10 shadow-lg transform transition hover:scale-[1.01]">
                 <div>
@@ -498,11 +480,9 @@
             </div>
 
             <div id="my-wishes-list" class="grid gap-4">
-                <!-- Injected via JS -->
             </div>
         </div>
 
-        <!-- VIEW: CREATE -->
         <div id="view-create" class="hidden max-w-2xl mx-auto px-4 py-10 w-full animate-fade-in">
             <div class="bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100">
                 <h2 class="text-3xl font-bold text-brand-navy mb-8 text-center">Create a New Wish ✨</h2>
@@ -523,7 +503,6 @@
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-gray-700 mb-4 ml-1">Choose a Theme</label>
                         <div class="grid grid-cols-3 gap-4">
-                            <!-- Theme 1 -->
                             <div class="theme-card active cursor-pointer group relative" data-theme="classic">
                                 <div
                                     class="h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
@@ -531,13 +510,13 @@
                                 <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
                                     <div
                                         class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                                 <div
                                     class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
                                     Classic</div>
                             </div>
-                            <!-- Theme 2 -->
                             <div class="theme-card cursor-pointer group relative" data-theme="ocean">
                                 <div
                                     class="h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
@@ -545,13 +524,13 @@
                                 <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
                                     <div
                                         class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                                 <div
                                     class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
                                     Ocean</div>
                             </div>
-                            <!-- Theme 3 -->
                             <div class="theme-card cursor-pointer group relative" data-theme="sunshine">
                                 <div
                                     class="h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl opacity-60 transition-all duration-300 group-hover:opacity-100">
@@ -559,14 +538,14 @@
                                 <div class="check-icon absolute inset-0 flex items-center justify-center hidden">
                                     <div
                                         class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                                 <div
                                     class="theme-label text-center text-xs mt-2 font-bold text-gray-400 transition-colors">
                                     Sunshine</div>
                             </div>
 
-                            <!-- Premium Theme 1: Midnight -->
                             <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl"
                                 data-theme="midnight">
                                 <div
@@ -582,13 +561,13 @@
                                 <div class="check-icon absolute inset-0 flex items-center justify-center hidden z-10">
                                     <div
                                         class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                                 <div class="theme-label text-center text-xs mt-2 font-bold text-gray-500">Midnight 🌙
                                 </div>
                             </div>
 
-                            <!-- Premium Theme 2: Love -->
                             <div class="theme-card relative group cursor-pointer overflow-hidden rounded-xl"
                                 data-theme="love">
                                 <div
@@ -604,7 +583,8 @@
                                 <div class="check-icon absolute inset-0 flex items-center justify-center hidden z-10">
                                     <div
                                         class="bg-white text-brand-pink rounded-full w-8 h-8 flex items-center justify-center shadow-md animate-bounce-in">
-                                        <i class="fas fa-check"></i></div>
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                                 <div class="theme-label text-center text-xs mt-2 font-bold text-gray-500">Love ❤️</div>
                             </div>
@@ -638,17 +618,15 @@
             </div>
         </div>
 
-        <!-- VIEW: PUBLIC WISH -->
         <div id="view-wish" class="hidden min-h-screen bg-gray-900 animate-fade-in w-full">
             <div id="wish-content"></div>
 
-            <a href="#home"
+            <a href="/" data-link
                 class="fixed bottom-4 right-4 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white text-xs font-bold hover:bg-white/40 transition z-50 flex items-center gap-2">
                 <span>Made with</span> <span class="font-cursive text-sm">WishLink</span>
             </a>
         </div>
 
-        <!-- VIEW: BLOG -->
         <div id="view-blog" class="hidden max-w-4xl mx-auto px-4 py-10 w-full animate-fade-in">
             <h2 class="text-3xl font-bold text-brand-navy mb-8">Birthday Ideas & Tips 💡</h2>
             <div class="grid md:grid-cols-2 gap-8">
@@ -681,7 +659,6 @@
             </div>
         </div>
 
-        <!-- VIEW: ADMIN -->
         <div id="view-admin" class="hidden max-w-6xl mx-auto px-4 py-10 w-full animate-fade-in">
             <h2 class="text-2xl font-bold mb-4 text-brand-navy">Admin Dashboard</h2>
             <div class="bg-white p-6 rounded-xl shadow">
@@ -706,8 +683,6 @@
         <p class="text-xs text-gray-600">&copy; 2025 WishLink. Crafted with emotions.</p>
     </footer>
 
-    <!-- New Audio Elements -->
-    <!-- REPLACED PLACEHOLDER WITH A REAL BIRTHDAY INSTRUMENTAL -->
     <audio id="bg-music" loop>
         <source src="h-bday.mp3" type="audio/mpeg">
     </audio>
@@ -715,7 +690,6 @@
         <source src="https://notificationsounds.com/storage/sounds/file-sounds-1235-victory.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- APP LOGIC -->
     <script>
         // --- 1. SUPABASE INIT & CHECK ---
         let supabase;
@@ -733,13 +707,15 @@
                 supabase.auth.onAuthStateChange((event, session) => {
                     currentUser = session?.user || null;
                     updateNavbar();
-                    if (currentUser && window.location.hash === '#login') {
+
+                    // Logic: If on login page and logged in, redirect
+                    if (currentUser && window.location.pathname === '/login') {
                         const returnTo = sessionStorage.getItem('return_to');
                         if (returnTo) {
                             sessionStorage.removeItem('return_to');
-                            window.location.hash = returnTo;
+                            navigateTo('/' + returnTo);
                         } else {
-                            window.location.hash = 'dashboard';
+                            navigateTo('/dashboard');
                         }
                     }
                 });
@@ -757,13 +733,15 @@
             initThemeSelection();
             const form = document.getElementById('create-form');
             if (form) form.addEventListener('submit', handleFormSubmit);
-            navigate();
+
+            // INITIALIZE ROUTER
+            router();
 
             // Setup background music interaction
             document.body.addEventListener('click', () => {
                 const bgMusic = document.getElementById('bg-music');
                 // Only play if on Wish Page
-                if (window.location.hash.startsWith('wish') && bgMusic && bgMusic.paused) {
+                if (window.location.pathname.startsWith('/wish') && bgMusic && bgMusic.paused) {
                     bgMusic.volume = 0.4;
                     bgMusic.play().catch(() => { });
                 }
@@ -773,7 +751,100 @@
         // --- GLOBAL STATE ---
         let currentUser = null;
         let selectedTheme = 'classic';
-        let isPremium = false; // NEW STATE
+        let isPremium = false;
+
+        // --- NEW ROUTER LOGIC ---
+
+        // 1. Handle Navigation for links
+        document.addEventListener("click", e => {
+            const link = e.target.closest("[data-link]");
+            if (link) {
+                e.preventDefault();
+                navigateTo(link.getAttribute("href"));
+            }
+        });
+
+        // 2. Handle Back/Forward buttons
+        window.addEventListener("popstate", () => {
+            router();
+        });
+
+        // 3. The navigateTo function you requested
+        const navigateTo = (url) => {
+            history.pushState(null, null, url);
+            router();
+        };
+
+        const router = async () => {
+            stopAllAudio();
+
+            const path = window.location.pathname;
+
+            // Define routes mapping
+            const routes = {
+                "/": "view-home",
+                "/create": "view-create",
+                "/login": "view-login",
+                "/dashboard": "view-dashboard",
+                "/blog": "view-blog",
+                "/admin": "view-admin"
+            };
+
+            let viewId = routes[path];
+            let param = null;
+
+            // Handle Wish Dynamic Route
+            if (path.startsWith("/wish/")) {
+                viewId = "view-wish";
+                param = path.split("/")[2];
+            }
+
+            // Default to home if route not found
+            if (!viewId) {
+                viewId = "view-home";
+            }
+
+            // Hide all views
+            document.querySelectorAll('[id^="view-"]').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-fade-in');
+            });
+
+            // Show active view
+            const activeEl = document.getElementById(viewId);
+            if (activeEl) {
+                activeEl.classList.remove('hidden');
+                void activeEl.offsetWidth; // Trigger reflow
+                activeEl.classList.add('animate-fade-in');
+                window.scrollTo(0, 0);
+            }
+
+            checkPremiumStatus();
+            updateNavbar();
+
+            if (viewId === 'view-wish' && param) loadWish(param);
+            else if (viewId === 'view-dashboard') loadDashboard();
+            else if (viewId === 'view-admin') loadAdmin();
+        };
+
+        function updateNavbar() {
+            const navLogin = document.getElementById('nav-login');
+            const navDash = document.getElementById('nav-dash');
+            const navLogout = document.getElementById('nav-logout');
+            const path = window.location.pathname;
+
+            if (currentUser) {
+                navLogin.classList.add('hidden');
+                navDash.classList.remove('hidden');
+                navLogout.classList.remove('hidden');
+            } else {
+                if (path === '/login') navLogin.classList.add('hidden');
+                else navLogin.classList.remove('hidden');
+
+                navDash.classList.add('hidden');
+                navLogout.classList.add('hidden');
+            }
+        }
 
         // --- HELPER: STOP AUDIO ---
         function stopAllAudio() {
@@ -807,12 +878,11 @@
                 "handler": function (response) {
                     console.log("Payment ID: ", response.razorpay_payment_id);
                     showToast("Payment Successful! Thank you! ❤️");
-                    // NEW: UNLOCK FEATURES IF PREMIUM
                     if (description.includes("Premium")) {
                         unlockThemes();
                         isPremium = true;
                         localStorage.setItem('is_premium_' + (currentUser?.id || 'guest'), 'true');
-                        loadDashboard(); // Refresh dashboard to hide banner
+                        loadDashboard();
                     }
                 },
                 "prefill": {
@@ -841,11 +911,9 @@
             handlePayment(49, "Premium Upgrade");
         }
 
-        // --- NEW: CHECK PREMIUM STATUS ---
+        // --- CHECK PREMIUM STATUS ---
         function checkPremiumStatus() {
             if (!currentUser) return;
-            // Check local storage for simple persistency in this demo
-            // In a real app, you would query a 'users' table in Supabase
             const status = localStorage.getItem('is_premium_' + currentUser.id);
             if (status === 'true') {
                 isPremium = true;
@@ -854,11 +922,9 @@
         }
 
         function unlockThemes() {
-            // Hide all locks
             document.querySelectorAll('.premium-lock').forEach(el => {
                 el.classList.add('hidden');
             });
-            // Hide banner if exists
             const banner = document.getElementById('premium-banner');
             if (banner) banner.style.display = 'none';
         }
@@ -882,64 +948,6 @@
             }, 3000);
         };
 
-        // --- ROUTER ---
-        function navigate() {
-            // 1. Stop all audio on ANY navigation
-            stopAllAudio();
-
-            const hash = window.location.hash || '#home';
-            const parts = hash.split('/');
-            const mainRoute = parts[0].replace('#', '');
-            const param = parts[1];
-
-            const views = ['home', 'login', 'dashboard', 'create', 'wish', 'blog', 'admin'];
-
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) {
-                    el.classList.add('hidden');
-                    el.classList.remove('animate-fade-in');
-                }
-            });
-
-            const activeEl = document.getElementById(`view-${mainRoute}`);
-            if (activeEl) {
-                activeEl.classList.remove('hidden');
-                void activeEl.offsetWidth;
-                activeEl.classList.add('animate-fade-in');
-                window.scrollTo(0, 0);
-            }
-
-            // Check premium status on every navigation
-            checkPremiumStatus();
-
-            if (mainRoute === 'wish' && param) loadWish(param);
-            else if (mainRoute === 'dashboard') loadDashboard();
-            else if (mainRoute === 'admin') loadAdmin();
-
-            updateNavbar();
-        }
-        window.addEventListener('hashchange', navigate);
-
-        function updateNavbar() {
-            const navLogin = document.getElementById('nav-login');
-            const navDash = document.getElementById('nav-dash');
-            const navLogout = document.getElementById('nav-logout');
-            const currentHash = window.location.hash;
-
-            if (currentUser) {
-                navLogin.classList.add('hidden');
-                navDash.classList.remove('hidden');
-                navLogout.classList.remove('hidden');
-            } else {
-                if (currentHash === '#login') navLogin.classList.add('hidden');
-                else navLogin.classList.remove('hidden');
-
-                navDash.classList.add('hidden');
-                navLogout.classList.add('hidden');
-            }
-        }
-
         // --- AUTH (GOOGLE OAUTH) ---
         window.handleLogin = async () => {
             if (!supabase) return showToast("Backend not ready", "error");
@@ -959,7 +967,7 @@
         window.handleLogout = async () => {
             if (supabase) await supabase.auth.signOut();
             showToast("See you soon! 👋");
-            window.location.hash = '#home';
+            navigateTo('/');
         };
 
         // --- THEME LOGIC ---
@@ -967,7 +975,6 @@
             const cards = document.querySelectorAll('.theme-card');
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    // Check for lock
                     if (card.querySelector('.premium-lock') && !card.querySelector('.premium-lock').classList.contains('hidden')) {
                         showToast("This theme is locked! Upgrade to Premium 👑", "error");
                         return;
@@ -1020,7 +1027,7 @@
             if (!currentUser) {
                 showToast("Please sign in to gift this wish ✨");
                 sessionStorage.setItem('return_to', 'create');
-                setTimeout(() => window.location.hash = '#login', 1200);
+                setTimeout(() => navigateTo('/login'), 1200);
                 return;
             }
 
@@ -1197,7 +1204,7 @@
                         </div>
                         
                         <div class="mt-10">
-                            <a href="create" class="inline-block px-8 py-3 bg-white text-brand-pink rounded-full font-bold shadow-lg hover:scale-105 transition transform text-sm md:text-base ring-4 ring-brand-pink/30">Create your own WishLink 🎁</a>
+                            <a href="/create" data-link class="inline-block px-8 py-3 bg-white text-brand-pink rounded-full font-bold shadow-lg hover:scale-105 transition transform text-sm md:text-base ring-4 ring-brand-pink/30">Create your own WishLink 🎁</a>
                         </div>
                     </div>
                 </div>
@@ -1220,7 +1227,7 @@
 
                 list.innerHTML = '';
                 if (!data || data.length === 0) {
-                    list.innerHTML = `<div class="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200 col-span-full"><p class="text-gray-500 font-medium mb-4">No wishes created yet.</p><a href="create" class="px-6 py-2 bg-brand-pink text-white rounded-full font-bold hover:bg-pink-700 transition shadow-lg">Create First Wish</a></div>`;
+                    list.innerHTML = `<div class="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200 col-span-full"><p class="text-gray-500 font-medium mb-4">No wishes created yet.</p><a href="/create" data-link class="px-6 py-2 bg-brand-pink text-white rounded-full font-bold hover:bg-pink-700 transition shadow-lg">Create First Wish</a></div>`;
                     return;
                 }
 
@@ -1232,7 +1239,7 @@
                                 <div>
                                     <h4 class="font-bold text-gray-800 text-lg">${wish.recipient_name}</h4>
                                     <p class="text-xs text-gray-500 truncate max-w-[150px] md:max-w-xs">${wish.message}</p>
-                                    <a href="wish/${wish.id}" class="text-brand-pink text-xs font-bold hover:underline mt-1 inline-flex items-center gap-1"><i class="fas fa-external-link-alt"></i> Open Wish 💌</a>
+                                    <a href="/wish/${wish.id}" data-link class="text-brand-pink text-xs font-bold hover:underline mt-1 inline-flex items-center gap-1"><i class="fas fa-external-link-alt"></i> Open Wish 💌</a>
                                 </div>
                             </div>
                             <button onclick="deleteWish('${wish.id}', this)" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors"><i class="fas fa-trash-alt"></i></button>
@@ -1336,14 +1343,15 @@
         }
 
         async function loadAdmin() {
-            if (!currentUser) return window.location.hash = '#login';
+            if (!currentUser) return navigateTo('/login');
             const statsEl = document.getElementById('admin-stats');
             const { count } = await supabase.from('wishes').select('*', { count: 'exact', head: true });
             statsEl.innerText = `Total Wishes: ${count}`;
         }
 
         function showShareModal(id) {
-            const url = `${window.location.origin}${window.location.pathname}wish/${id}`;
+            // Clean URL generation
+            const url = `${window.location.origin}/wish/${id}`;
             const modalHtml = `
             <div id="success-modal" class="fixed inset-0 bg-brand-navy/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
                 <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-bounce-in shadow-2xl relative overflow-hidden">
@@ -1357,7 +1365,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <a href="whatsapp://send?text=${encodeURIComponent('Happy Birthday! 🎂 I made a special surprise for you: ' + url)}" class="col-span-1 py-3 bg-[#25D366] text-white rounded-xl flex items-center justify-center gap-2 hover:brightness-105 transition shadow-lg font-bold text-sm"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                        <button onclick="window.location.hash='#wish/${id}'; document.getElementById('success-modal').remove()" class="col-span-1 py-3 bg-brand-navy text-white rounded-xl font-bold hover:bg-blue-900 transition shadow-lg flex items-center justify-center gap-2 text-sm"><i class="fas fa-external-link-alt"></i> Open</button>
+                        <button onclick="navigateTo('/wish/${id}'); document.getElementById('success-modal').remove()" class="col-span-1 py-3 bg-brand-navy text-white rounded-xl font-bold hover:bg-blue-900 transition shadow-lg flex items-center justify-center gap-2 text-sm"><i class="fas fa-external-link-alt"></i> Open</button>
                     </div>
                     <button onclick="document.getElementById('success-modal').remove()" class="text-gray-400 hover:text-gray-600 text-xs font-semibold">Maybe Later</button>
                 </div>
