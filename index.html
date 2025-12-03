@@ -367,7 +367,8 @@
                 class="bg-white p-10 rounded-3xl shadow-xl max-w-sm w-full text-center border border-gray-100 animate-slide-up">
                 <div
                     class="w-16 h-16 bg-pink-100 text-brand-pink rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-lg">
-                    <i class="fas fa-heart"></i></div>
+                    <i class="fas fa-heart"></i>
+                </div>
                 <h2 class="text-3xl font-bold mb-2 text-brand-navy">Welcome Back!</h2>
                 <p class="text-gray-500 mb-8 text-sm">Sign in to save your wishes forever.</p>
                 <button onclick="App.Services.login()"
@@ -431,7 +432,8 @@
                                 class="w-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center group-hover:border-brand-pink group-hover:bg-pink-50 transition-all">
                                 <div
                                     class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
-                                    <i class="fas fa-camera text-xl"></i></div>
+                                    <i class="fas fa-camera text-xl"></i>
+                                </div>
                                 <p id="file-upload-text" class="text-sm text-gray-500 font-medium">Click to upload</p>
                             </div>
                         </div>
@@ -1111,10 +1113,13 @@
                     }
 
                     if (route === 'dashboard') App.Controllers.loadDashboard();
+
+                    // FIXED: Check premium status BEFORE rendering themes to ensure locks are correct
                     if (route === 'create') {
+                        App.Services.checkPremium();
                         App.UI.renderThemes();
-                        App.Services.checkPremium(); // Re-check premium on create page load
                     }
+
                     if (route === 'wish' && param) App.Controllers.loadWish(param);
                     if (route === 'login' && App.State.user) this.go('dashboard');
                 }
