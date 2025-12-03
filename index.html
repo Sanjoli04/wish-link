@@ -35,13 +35,13 @@
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                        'scroll': 'scroll 20s linear infinite',
+                        'slide-in-left': 'slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
                         slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
                         bounceIn: { '0%': { transform: 'scale(0)' }, '70%': { transform: 'scale(1.1)' }, '100%': { transform: 'scale(1)' } },
-                        scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-100%)' } }
+                        slideInLeft: { '0%': { opacity: '0', transform: 'translateX(-20px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } }
                     }
                 }
             }
@@ -148,6 +148,33 @@
             border-left: 4px solid #ef4444;
         }
 
+        /* --- DONATION NOTIFICATION --- */
+        #donation-popup-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .donation-card {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 12px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            max-width: 300px;
+        }
+
         /* --- UI ELEMENTS --- */
         .btn-gift {
             background: #FF0055;
@@ -236,16 +263,6 @@
                 box-shadow: 0 0 10px white;
             }
         }
-
-        /* Hide Scrollbar for Supporter Feed */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
     </style>
 </head>
 
@@ -254,6 +271,7 @@
 
     <script src="config.js"></script>
     <div id="toast-container"></div>
+    <div id="donation-popup-container"></div>
 
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 h-16 transition-all">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
@@ -316,22 +334,6 @@
                         <i
                             class="fas fa-birthday-cake text-6xl opacity-50 mb-3 text-brand-pink group-hover:scale-110 transition duration-500"></i>
                         <p class="font-bold opacity-50 text-brand-navy">Tap to Create Yours</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Supporters Ticker (Donations Feed) -->
-            <section class="py-10 bg-brand-bg border-y border-gray-100 overflow-hidden">
-                <div class="max-w-6xl mx-auto px-4 mb-6 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-brand-navy">Recent Supporters ☕</h2>
-                    <button onclick="App.Services.buyCoffee(50)"
-                        class="text-xs font-bold text-brand-pink hover:underline">Support Us &rarr;</button>
-                </div>
-                <!-- Scrolling container -->
-                <div class="relative w-full overflow-hidden">
-                    <div id="donations-ticker" class="flex gap-4 animate-scroll whitespace-nowrap w-max px-4">
-                        <!-- Items injected here by JS -->
-                        <div class="text-sm text-gray-400 italic">Loading supporters...</div>
                     </div>
                 </div>
             </section>
@@ -552,6 +554,28 @@
 
     <!-- APP LOGIC -->
     <script>
+        // --- HELPERS ---
+        const Utils = {
+            timeAgo(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const seconds = Math.floor((now - date) / 1000);
+
+                if (seconds < 60) return "Just now";
+                let interval = Math.floor(seconds / 31536000);
+                if (interval > 1) return interval + "y ago";
+                interval = Math.floor(seconds / 2592000);
+                if (interval > 1) return interval + "mo ago";
+                interval = Math.floor(seconds / 86400);
+                if (interval > 1) return interval + "d ago";
+                interval = Math.floor(seconds / 3600);
+                if (interval > 1) return interval + "h ago";
+                interval = Math.floor(seconds / 60);
+                if (interval > 1) return interval + "m ago";
+                return "Just now";
+            }
+        };
+
         // --- CAKE REGISTRY ---
         const CakeFactory = {
             // Reusable Candle Group (Scaled & Positioned for 300x400 viewbox)
@@ -887,8 +911,9 @@
                 user: null,
                 isPremium: false,
                 currentTheme: 'classic',
-                editingId: null, // Track if we are editing
-                donations: []
+                editingId: null,
+                lastDonationCheck: new Date(Date.now() - 60000).toISOString(), // Start checking from 1 min ago
+                processedDonations: new Set()
             },
 
             UI: {
@@ -942,29 +967,29 @@
                     `).join('');
                 },
 
-                renderDonations(donations) {
-                    const ticker = document.getElementById('donations-ticker');
-                    if (!ticker) return;
-
-                    if (!donations || donations.length === 0) {
-                        ticker.innerHTML = `<div class="text-sm text-gray-400 italic">Be the first supporter! ☕</div>`;
-                        ticker.classList.remove('animate-scroll');
-                        return;
-                    }
-
-                    // Duplicate content for smooth infinite scroll if enough items
-                    const content = donations.map(d => `
-                        <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                            <div class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-xs">☕</div>
-                            <span class="font-bold text-brand-navy text-xs">${d.donor_name || 'Anonymous'}</span>
-                            <span class="text-gray-400 text-xs">₹${d.amount}</span>
+                showDonationPopup(donation) {
+                    const container = document.getElementById('donation-popup-container');
+                    const card = document.createElement('div');
+                    card.className = "donation-card";
+                    card.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg shadow-sm">☕</div>
+                        <div>
+                            <div class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">New Supporter</div>
+                            <div class="text-sm font-bold text-brand-navy">
+                                ${donation.donor_name} <span class="font-normal text-gray-500">donated</span> ₹${donation.amount}
+                            </div>
+                            <div class="text-[10px] text-gray-400 mt-0.5">${Utils.timeAgo(donation.created_at)}</div>
                         </div>
-                    `).join('');
+                    `;
 
-                    ticker.innerHTML = content + (donations.length > 5 ? content : '');
+                    container.appendChild(card);
 
-                    if (donations.length > 5) ticker.classList.add('animate-scroll');
-                    else ticker.classList.remove('animate-scroll');
+                    // Remove after 6 seconds
+                    setTimeout(() => {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateX(-20px)';
+                        setTimeout(() => card.remove(), 500);
+                    }, 6000);
                 }
             },
 
@@ -989,10 +1014,12 @@
                         }
                     });
 
-                    // Initial Load of Public Data
-                    this.fetchDonations();
+                    // Start polling for NEW donations (last 60 seconds rolling window)
+                    this.pollRecentDonations();
+                    setInterval(() => this.pollRecentDonations(), 10000); // Check every 10s
                 },
 
+                // ... (login, logout, uploadImage, checkPremium, updatePremiumUI, fetchUserDonationTotal, buyPremium - UNCHANGED)
                 async login() {
                     const { error } = await this.supabase.auth.signInWithOAuth({
                         provider: 'google',
@@ -1023,15 +1050,12 @@
                         App.Services.updatePremiumUI();
                         return;
                     }
-
-                    // Fetch from 'premiums' table
                     const { data, error } = await this.supabase
                         .from('premiums')
                         .select('is_active')
                         .eq('user_id', App.State.user.id)
                         .eq('is_active', true)
                         .maybeSingle();
-
                     App.State.isPremium = !!data;
                     App.Services.updatePremiumUI();
                 },
@@ -1039,7 +1063,6 @@
                 updatePremiumUI() {
                     const banner = document.getElementById('premium-banner');
                     const isPrem = App.State.isPremium;
-
                     if (isPrem) {
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
                         if (banner) banner.classList.add('hidden');
@@ -1047,23 +1070,8 @@
                         if (banner) banner.classList.remove('hidden');
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.remove('hidden'));
                     }
-
-                    // Re-render themes if currently on Create page
                     if (window.location.hash === '#create') {
                         App.UI.renderThemes();
-                    }
-                },
-
-                async fetchDonations() {
-                    const { data, error } = await this.supabase
-                        .from('donations')
-                        .select('donor_name, amount, message, created_at')
-                        .order('created_at', { ascending: false })
-                        .limit(20);
-
-                    if (!error && data) {
-                        App.State.donations = data;
-                        App.UI.renderDonations(data);
                     }
                 },
 
@@ -1073,14 +1081,12 @@
                         .from('donations')
                         .select('amount')
                         .eq('user_id', App.State.user.id);
-
                     if (error || !data) return 0;
                     return data.reduce((sum, item) => sum + item.amount, 0);
                 },
 
                 buyPremium() {
                     if (!App.State.user) return App.UI.toast("Please login first");
-
                     this.triggerPayment(4900, "WishLink Premium", "Lifetime Unlock", async (paymentId) => {
                         const { error } = await this.supabase.from('premiums').insert([{
                             user_id: App.State.user.id,
@@ -1088,7 +1094,6 @@
                             plan_type: 'lifetime',
                             payment_id: paymentId
                         }]);
-
                         if (error) {
                             App.UI.toast("Payment verified but activation failed. Contact support.", "error");
                         } else {
@@ -1098,10 +1103,37 @@
                     });
                 },
 
+                async pollRecentDonations() {
+                    // Logic: Get donations created after the last check time
+                    // For safety, we initially set 'lastDonationCheck' to 1 min ago.
+
+                    const { data, error } = await this.supabase
+                        .from('donations')
+                        .select('id, donor_name, amount, created_at')
+                        .gt('created_at', App.State.lastDonationCheck)
+                        .order('created_at', { ascending: true }); // Show oldest first if multiple
+
+                    if (!error && data && data.length > 0) {
+                        // Update timestamp to the newest one found
+                        App.State.lastDonationCheck = data[data.length - 1].created_at;
+
+                        data.forEach((donation, index) => {
+                            if (!App.State.processedDonations.has(donation.id)) {
+                                App.State.processedDonations.add(donation.id);
+                                // Stagger popups if multiple came in at once
+                                setTimeout(() => {
+                                    App.UI.showDonationPopup(donation);
+                                }, index * 2000);
+                            }
+                        });
+                    }
+                },
+
                 buyCoffee(amount) {
                     if (!App.State.user) return App.UI.toast("Please login to donate ❤️", "error");
 
                     this.triggerPayment(amount * 100, "Buy us a Coffee", "Support WishLink", async (paymentId) => {
+                        // Insert into 'donations' table
                         const { error } = await this.supabase.from('donations').insert([{
                             user_id: App.State.user.id,
                             amount: amount,
@@ -1112,17 +1144,17 @@
 
                         if (error) {
                             console.error(error);
-                            App.UI.toast("Thanks! Donation recorded locally.", "success");
+                            App.UI.toast("Donation recorded (Offline mode)", "success");
                         } else {
+                            // Toast handles the "Success" feedback now
                             App.UI.toast("Thank you for the coffee! ❤️");
-                            App.Services.fetchDonations();
+                            // Poller will pick up the notification automatically
                         }
                     });
                 },
 
                 triggerPayment(amount, name, desc, successCallback) {
                     if (typeof Razorpay === 'undefined' || !CONFIG.RAZORPAY_KEY) {
-                        // REPLACED ALERT WITH TOAST AS REQUESTED
                         App.UI.toast("Dev Mode: Simulating Payment Success ✅", "success");
                         successCallback("simulated_pay_id_123");
                         return;
@@ -1139,7 +1171,7 @@
                 }
             },
 
-            // ... (Audio, CakeFactory logic same as before)
+            // ... (Audio, Router, Controllers - UNCHANGED from previous versions unless specifically updated)
             Audio: {
                 startMusic() {
                     const bgMusic = document.getElementById('bg-music');
@@ -1240,7 +1272,6 @@
                     if (route === 'dashboard') App.Controllers.loadDashboard();
 
                     if (route === 'create') {
-                        // NEW: Reset form if NOT editing
                         if (!App.State.editingId) {
                             document.getElementById('create-form').reset();
                             document.getElementById('submit-btn').innerHTML = 'Gift this Wish 🎁';
@@ -1249,7 +1280,6 @@
                             document.getElementById('file-upload-text').className = 'text-sm text-gray-500 font-medium';
                             App.State.currentTheme = 'classic';
                         }
-
                         App.Services.checkPremium();
                         App.UI.renderThemes();
                     }
@@ -1293,21 +1323,16 @@
 
                     if (error) return App.UI.toast("Error loading wish", "error");
 
-                    // Populate State & Form
                     App.State.editingId = id;
                     App.State.currentTheme = data.theme;
-
                     document.getElementById('recipient').value = data.recipient_name;
                     document.getElementById('message').value = data.message;
-
-                    // UI Updates for Edit Mode
                     document.getElementById('create-title').innerText = 'Edit Wish ✏️';
                     document.getElementById('submit-btn').innerHTML = 'Update Wish 💾';
                     if (data.image_url) {
                         document.getElementById('file-upload-text').textContent = "Image Attached (Upload to replace)";
                         document.getElementById('file-upload-text').className = "text-brand-pink font-bold";
                     }
-
                     App.Router.go('create');
                 },
 
@@ -1341,7 +1366,6 @@
                         if (imgUrl) payload.image_url = imgUrl;
 
                         let result;
-
                         if (isEdit) {
                             result = await App.Services.supabase
                                 .from('wishes')
@@ -1361,8 +1385,6 @@
                         if (result.error) throw result.error;
 
                         App.Controllers.showShareModal(result.data.id);
-
-                        // Reset State
                         App.State.editingId = null;
                         document.getElementById('create-form').reset();
                         App.State.currentTheme = 'classic';
@@ -1404,8 +1426,6 @@
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
 
                     App.Services.checkPremium();
-
-                    // FETCH AND DISPLAY DONATION TOTAL
                     const totalDonation = await App.Services.fetchUserDonationTotal();
                     document.getElementById('user-total-donation').innerText = `₹${totalDonation}`;
 
@@ -1441,7 +1461,6 @@
                     App.UI.toast("Wish deleted");
                 },
 
-                // ... (loadWish, blowCandle, startConfetti same as before)
                 async loadWish(id) {
                     const container = document.getElementById('wish-content');
                     container.innerHTML = '<div class="text-white flex flex-col items-center gap-4"><i class="fas fa-birthday-cake fa-bounce text-5xl"></i><p>Baking the cake...</p></div>';
