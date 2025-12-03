@@ -175,6 +175,33 @@
             max-width: 300px;
         }
 
+        /* --- MODAL TRANSITIONS --- */
+        .modal-bg {
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-hidden .modal-content {
+            transform: scale(0.9);
+        }
+
+        .modal-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-visible .modal-content {
+            transform: scale(1);
+        }
+
         /* --- UI ELEMENTS --- */
         .btn-gift {
             background: #FF0055;
@@ -272,6 +299,35 @@
     <script src="config.js"></script>
     <div id="toast-container"></div>
     <div id="donation-popup-container"></div>
+
+    <!-- CUSTOM DONATION MODAL -->
+    <div id="donation-modal"
+        class="modal-bg modal-hidden fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div
+            class="modal-content bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
+
+            <div
+                class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm animate-bounce-in">
+                ☕</div>
+            <h3 class="text-2xl font-bold text-brand-navy mb-2">Buy us a Coffee</h3>
+            <p class="text-gray-500 text-sm mb-6">Support WishLink & join the Wall of Love!</p>
+
+            <div class="mb-6 text-left">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Your Note
+                    (Optional)</label>
+                <textarea id="donation-note-input" rows="3" placeholder="Write something sweet..."
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-pink focus:border-transparent outline-none transition text-sm resize-none"></textarea>
+            </div>
+
+            <button onclick="App.Controllers.processDonation()" id="donate-confirm-btn"
+                class="w-full py-3.5 bg-brand-pink text-white rounded-xl font-bold text-sm shadow-lg shadow-pink-200 hover:shadow-pink-300 hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
+                Donate <span id="donate-amount-display">₹50</span>
+            </button>
+            <button onclick="App.UI.toggleDonationModal(false)"
+                class="mt-4 text-xs text-gray-400 font-bold hover:text-gray-600 uppercase tracking-widest">Cancel</button>
+        </div>
+    </div>
 
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 h-16 transition-all">
         <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
@@ -886,7 +942,8 @@
                 currentTheme: 'classic',
                 editingId: null,
                 lastDonationCheck: new Date(Date.now() - 60000).toISOString(),
-                processedDonations: new Set()
+                processedDonations: new Set(),
+                pendingDonationAmount: 0 // Store amount for modal flow
             },
 
             UI: {
@@ -994,6 +1051,19 @@
                             </div>
                         </div>
                     `).join('');
+                },
+
+                toggleDonationModal(show) {
+                    const modal = document.getElementById('donation-modal');
+                    if (show) {
+                        modal.classList.remove('modal-hidden');
+                        modal.classList.add('modal-visible');
+                        document.getElementById('donation-note-input').focus();
+                    } else {
+                        modal.classList.remove('modal-visible');
+                        modal.classList.add('modal-hidden');
+                        document.getElementById('donation-note-input').value = ''; // Reset input
+                    }
                 }
             },
 
@@ -1023,7 +1093,6 @@
                     setInterval(() => this.pollRecentDonations(), 10000);
                 },
 
-                // ... (login, logout, uploadImage, checkPremium, updatePremiumUI, fetchUserDonationTotal, buyPremium - UNCHANGED)
                 async login() {
                     const { error } = await this.supabase.auth.signInWithOAuth({
                         provider: 'google',
@@ -1149,27 +1218,10 @@
                 buyCoffee(amount) {
                     if (!App.State.user) return App.UI.toast("Please login to donate ❤️", "error");
 
-                    // Prompt for Note
-                    const note = prompt("Leave a sweet note for the Wall of Love? (Optional) 🖊️");
-
-                    this.triggerPayment(amount * 100, "Buy us a Coffee", "Support WishLink", async (paymentId) => {
-                        const { error } = await this.supabase.from('donations').insert([{
-                            user_id: App.State.user.id,
-                            amount: amount,
-                            donor_name: App.State.user.user_metadata.full_name || App.State.user.email.split('@')[0],
-                            message: "Bought a coffee ☕",
-                            note: note || null, // Save the note
-                            payment_id: paymentId
-                        }]);
-
-                        if (error) {
-                            console.error(error);
-                            App.UI.toast("Donation recorded (Offline mode)", "success");
-                        } else {
-                            App.UI.toast("Thank you for the coffee & note! ❤️");
-                            this.fetchWallOfLove(); // Refresh wall immediately
-                        }
-                    });
+                    // REPLACED PROMPT WITH MODAL FLOW
+                    App.State.pendingDonationAmount = amount;
+                    document.getElementById('donate-amount-display').textContent = `₹${amount}`;
+                    App.UI.toggleDonationModal(true);
                 },
 
                 triggerPayment(amount, name, desc, successCallback) {
@@ -1187,81 +1239,6 @@
                     };
                     const rzp = new Razorpay(options);
                     rzp.open();
-                }
-            },
-
-            // ... (Audio, Router, Controllers - UNCHANGED)
-            Audio: {
-                startMusic() {
-                    const bgMusic = document.getElementById('bg-music');
-                    bgMusic.volume = 0.4;
-                    bgMusic.play().catch(() => console.log('Autoplay blocked'));
-                },
-
-                stopAll() {
-                    const bg = document.getElementById('bg-music');
-                    const cheer = document.getElementById('cheer-audio');
-                    bg.pause(); bg.currentTime = 0;
-                    cheer.pause(); cheer.currentTime = 0;
-                    this.stopMic();
-                },
-
-                async initMic(onBlow) {
-                    try {
-                        App.State.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        App.State.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        App.State.analyser = App.State.audioContext.createAnalyser();
-                        App.State.microphone = App.State.audioContext.createMediaStreamSource(App.State.mediaStream);
-                        App.State.microphone.connect(App.State.analyser);
-                        App.State.analyser.fftSize = 256;
-
-                        const bufferLength = App.State.analyser.frequencyBinCount;
-                        const dataArray = new Uint8Array(bufferLength);
-
-                        const btn = document.getElementById('mic-btn');
-                        if (btn) {
-                            btn.innerHTML = '<i class="fas fa-microphone-lines fa-beat"></i> Listening...';
-                            btn.classList.remove('bg-white', 'text-brand-navy');
-                            btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
-                        }
-
-                        const detectBlow = () => {
-                            if (!App.State.audioContext) return;
-                            App.State.analyser.getByteFrequencyData(dataArray);
-                            let sum = 0;
-                            for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                            const average = sum / bufferLength;
-
-                            if (average > 40) {
-                                onBlow();
-                                this.stopMic();
-                            } else {
-                                requestAnimationFrame(detectBlow);
-                            }
-                        };
-                        detectBlow();
-                        App.UI.toast("Microphone Active! Blow on the screen 💨");
-                    } catch (err) {
-                        console.error("Mic error", err);
-                        App.UI.toast("Microphone denied. Tap the cake instead.", "error");
-                    }
-                },
-
-                stopMic() {
-                    if (App.State.mediaStream) {
-                        App.State.mediaStream.getTracks().forEach(track => track.stop());
-                        App.State.mediaStream = null;
-                    }
-                    if (App.State.audioContext) {
-                        App.State.audioContext.close();
-                        App.State.audioContext = null;
-                    }
-                    const btn = document.getElementById('mic-btn');
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-microphone"></i> Enable Mic';
-                        btn.classList.add('bg-white', 'text-brand-navy');
-                        btn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
-                    }
                 }
             },
 
@@ -1319,6 +1296,34 @@
                     } else {
                         container.innerHTML = `<button onclick="App.Router.go('login')" class="text-brand-navy hover:text-brand-pink transition font-bold">Login</button>`;
                     }
+                },
+
+                // --- NEW DONATION HANDLER ---
+                processDonation() {
+                    const note = document.getElementById('donation-note-input').value;
+                    const amount = App.State.pendingDonationAmount || 50;
+
+                    // Close Modal immediately
+                    App.UI.toggleDonationModal(false);
+
+                    App.Services.triggerPayment(amount * 100, "Buy us a Coffee", "Support WishLink", async (paymentId) => {
+                        const { error } = await App.Services.supabase.from('donations').insert([{
+                            user_id: App.State.user.id,
+                            amount: amount,
+                            donor_name: App.State.user.user_metadata.full_name || App.State.user.email.split('@')[0],
+                            message: "Bought a coffee ☕",
+                            note: note || null, // Save the note from modal
+                            payment_id: paymentId
+                        }]);
+
+                        if (error) {
+                            console.error(error);
+                            App.UI.toast("Donation recorded (Offline mode)", "success");
+                        } else {
+                            App.UI.toast("Thank you for the coffee & note! ❤️");
+                            App.Services.fetchWallOfLove(); // Refresh wall
+                        }
+                    });
                 },
 
                 selectTheme(id, isPremium) {
