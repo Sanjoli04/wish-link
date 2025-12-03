@@ -35,11 +35,13 @@
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                        'scroll': 'scroll 20s linear infinite',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
                         slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        bounceIn: { '0%': { transform: 'scale(0)' }, '70%': { transform: 'scale(1.1)' }, '100%': { transform: 'scale(1)' } }
+                        bounceIn: { '0%': { transform: 'scale(0)' }, '70%': { transform: 'scale(1.1)' }, '100%': { transform: 'scale(1)' } },
+                        scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-100%)' } }
                     }
                 }
             }
@@ -234,6 +236,16 @@
                 box-shadow: 0 0 10px white;
             }
         }
+
+        /* Hide Scrollbar for Supporter Feed */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
@@ -304,6 +316,22 @@
                         <i
                             class="fas fa-birthday-cake text-6xl opacity-50 mb-3 text-brand-pink group-hover:scale-110 transition duration-500"></i>
                         <p class="font-bold opacity-50 text-brand-navy">Tap to Create Yours</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Supporters Ticker (Donations Feed) -->
+            <section class="py-10 bg-brand-bg border-y border-gray-100 overflow-hidden">
+                <div class="max-w-6xl mx-auto px-4 mb-6 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-brand-navy">Recent Supporters ☕</h2>
+                    <button onclick="App.Services.buyCoffee(50)"
+                        class="text-xs font-bold text-brand-pink hover:underline">Support Us &rarr;</button>
+                </div>
+                <!-- Scrolling container -->
+                <div class="relative w-full overflow-hidden">
+                    <div id="donations-ticker" class="flex gap-4 animate-scroll whitespace-nowrap w-max px-4">
+                        <!-- Items injected here by JS -->
+                        <div class="text-sm text-gray-400 italic">Loading supporters...</div>
                     </div>
                 </div>
             </section>
@@ -716,7 +744,7 @@
                 `;
             },
 
-            // 5. Dark Chocolate (Midnight) - The Requested Fix
+            // 5. Dark Chocolate (Midnight)
             getChocolateCake() {
                 return `
                     <svg viewBox="0 0 350 400" xmlns="http://www.w3.org/2000/svg" class="w-64 h-auto mx-auto">
@@ -855,7 +883,8 @@
                 microphone: null,
                 analyser: null,
                 isBlowing: false,
-                mediaStream: null
+                mediaStream: null,
+                donations: []
             },
 
             UI: {
@@ -907,6 +936,31 @@
                             <div class="absolute bottom-2 w-full text-center text-white text-xs font-bold shadow-sm z-10">${t.name}</div>
                         </div>
                     `).join('');
+                },
+
+                renderDonations(donations) {
+                    const ticker = document.getElementById('donations-ticker');
+                    if (!ticker) return;
+
+                    if (!donations || donations.length === 0) {
+                        ticker.innerHTML = `<div class="text-sm text-gray-400 italic">Be the first supporter! ☕</div>`;
+                        ticker.classList.remove('animate-scroll');
+                        return;
+                    }
+
+                    // Duplicate content for smooth infinite scroll if enough items
+                    const content = donations.map(d => `
+                        <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                            <div class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-xs">☕</div>
+                            <span class="font-bold text-brand-navy text-xs">${d.donor_name || 'Anonymous'}</span>
+                            <span class="text-gray-400 text-xs">₹${d.amount}</span>
+                        </div>
+                    `).join('');
+
+                    ticker.innerHTML = content + (donations.length > 5 ? content : '');
+
+                    if (donations.length > 5) ticker.classList.add('animate-scroll');
+                    else ticker.classList.remove('animate-scroll');
                 }
             },
 
@@ -923,13 +977,16 @@
                     this.supabase.auth.onAuthStateChange((event, session) => {
                         App.State.user = session?.user || null;
                         App.Controllers.updateNav();
-                        App.Services.checkPremium(); // Call immediately when auth changes
+                        App.Services.checkPremium();
                         if (App.State.user && window.location.hash === '#login') {
                             const returnTo = sessionStorage.getItem('return_to') || 'dashboard';
                             sessionStorage.removeItem('return_to');
                             App.Router.go(returnTo);
                         }
                     });
+
+                    // Initial Load of Public Data
+                    this.fetchDonations();
                 },
 
                 async login() {
@@ -956,55 +1013,113 @@
                     return data.secure_url;
                 },
 
-                checkPremium() {
-                    if (!App.State.user) return;
-                    const isPrem = localStorage.getItem(`premium_${App.State.user.id}`) === 'true';
-                    App.State.isPremium = isPrem;
+                async checkPremium() {
+                    if (!App.State.user) {
+                        App.State.isPremium = false;
+                        App.Services.updatePremiumUI();
+                        return;
+                    }
 
-                    // --- KEY FIX: Force UI Update Immediately ---
+                    // Fetch from 'premiums' table
+                    const { data, error } = await this.supabase
+                        .from('premiums')
+                        .select('is_active')
+                        .eq('user_id', App.State.user.id)
+                        .eq('is_active', true)
+                        .maybeSingle();
+
+                    App.State.isPremium = !!data;
+                    App.Services.updatePremiumUI();
+                },
+
+                updatePremiumUI() {
+                    const banner = document.getElementById('premium-banner');
+                    const isPrem = App.State.isPremium;
+
                     if (isPrem) {
-                        // Hide all locks immediately
                         document.querySelectorAll('.premium-lock').forEach(el => el.classList.add('hidden'));
-
-                        // Hide banner if it exists in DOM
-                        const banner = document.getElementById('premium-banner');
                         if (banner) banner.classList.add('hidden');
+                    } else {
+                        if (banner) banner.classList.remove('hidden');
+                        document.querySelectorAll('.premium-lock').forEach(el => el.classList.remove('hidden'));
+                    }
 
-                        // Re-render themes if on Create page to remove locks
-                        if (window.location.hash === '#create') {
-                            App.UI.renderThemes();
-                        }
+                    // Re-render themes if currently on Create page
+                    if (window.location.hash === '#create') {
+                        App.UI.renderThemes();
+                    }
+                },
+
+                async fetchDonations() {
+                    // Public feed - no auth required
+                    const { data, error } = await this.supabase
+                        .from('donations')
+                        .select('donor_name, amount, message, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(20);
+
+                    if (!error && data) {
+                        App.State.donations = data;
+                        App.UI.renderDonations(data);
                     }
                 },
 
                 buyPremium() {
-                    this.triggerPayment(4900, "WishLink Premium", "Unlock all themes", () => {
-                        App.UI.toast("Payment Successful! Premium Unlocked 👑");
-                        // Set local storage
-                        if (App.State.user) {
-                            localStorage.setItem(`premium_${App.State.user.id}`, 'true');
+                    if (!App.State.user) return App.UI.toast("Please login first");
+
+                    this.triggerPayment(4900, "WishLink Premium", "Lifetime Unlock", async (paymentId) => {
+                        // Insert into 'premiums' table
+                        const { error } = await this.supabase.from('premiums').insert([{
+                            user_id: App.State.user.id,
+                            is_active: true,
+                            plan_type: 'lifetime',
+                            payment_id: paymentId
+                        }]);
+
+                        if (error) {
+                            App.UI.toast("Payment verified but activation failed. Contact support.", "error");
+                        } else {
+                            App.UI.toast("Premium Unlocked Forever! 👑");
+                            App.Services.checkPremium(); // Refresh state
                         }
-                        // Force re-check
-                        App.Services.checkPremium();
                     });
                 },
 
                 buyCoffee(amount) {
-                    this.triggerPayment(amount * 100, "Buy us a Coffee", "Thanks for your support! ☕", () => {
-                        App.UI.toast("Thank you for the coffee! ❤️");
+                    if (!App.State.user) return App.UI.toast("Please login to donate ❤️", "error");
+
+                    this.triggerPayment(amount * 100, "Buy us a Coffee", "Support WishLink", async (paymentId) => {
+                        // Insert into 'donations' table
+                        const { error } = await this.supabase.from('donations').insert([{
+                            user_id: App.State.user.id,
+                            amount: amount,
+                            donor_name: App.State.user.user_metadata.full_name || App.State.user.email.split('@')[0],
+                            message: "Bought a coffee ☕",
+                            payment_id: paymentId
+                        }]);
+
+                        if (error) {
+                            console.error(error);
+                            App.UI.toast("Thanks! Donation recorded locally.", "success");
+                        } else {
+                            App.UI.toast("Thank you for the coffee! ❤️");
+                            App.Services.fetchDonations(); // Refresh feed
+                        }
                     });
                 },
 
                 triggerPayment(amount, name, desc, successCallback) {
                     if (typeof Razorpay === 'undefined' || !CONFIG.RAZORPAY_KEY) {
-                        alert("Payment Config Missing. Simulating success for demo.");
-                        successCallback();
+                        alert("Payment Config Missing. Simulating success.");
+                        successCallback("simulated_pay_id_123");
                         return;
                     }
                     const options = {
                         key: CONFIG.RAZORPAY_KEY, amount: amount, currency: "INR",
                         name: name, description: desc,
-                        handler: function (response) { successCallback(); }
+                        handler: function (response) {
+                            successCallback(response.razorpay_payment_id);
+                        }
                     };
                     const rzp = new Razorpay(options);
                     rzp.open();
@@ -1114,7 +1229,6 @@
 
                     if (route === 'dashboard') App.Controllers.loadDashboard();
 
-                    // FIXED: Check premium status BEFORE rendering themes to ensure locks are correct
                     if (route === 'create') {
                         App.Services.checkPremium();
                         App.UI.renderThemes();
@@ -1139,11 +1253,6 @@
                 },
 
                 selectTheme(id, isPremium) {
-                    // Re-check state to be sure
-                    if (App.State.user && localStorage.getItem(`premium_${App.State.user.id}`) === 'true') {
-                        App.State.isPremium = true;
-                    }
-
                     if (isPremium && !App.State.isPremium) {
                         App.UI.toast("This theme requires Premium upgrade 👑", "error");
                         return;
@@ -1229,7 +1338,6 @@
                     const list = document.getElementById('my-wishes-list');
                     list.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-brand-pink text-2xl"></i></div>';
 
-                    // Force Premium Check on load
                     App.Services.checkPremium();
 
                     const { data, error } = await App.Services.supabase
@@ -1353,10 +1461,7 @@
                     const flames = document.querySelectorAll('.flame');
                     if (flames.length === 0 || flames[0].classList.contains('hidden')) return;
 
-                    // Apply the 'flame-out' class
                     flames.forEach(flame => flame.classList.add('flame-out'));
-
-                    // Stop Mic Immediately
                     App.Audio.stopMic();
 
                     const bg = document.getElementById('bg-music');
@@ -1366,7 +1471,6 @@
 
                     App.Controllers.startConfetti();
 
-                    // Wait for flame animation (300ms) then switch phase
                     setTimeout(() => {
                         const p1 = document.getElementById('phase-1');
                         const p2 = document.getElementById('phase-2');
@@ -1419,9 +1523,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             App.Services.init();
             App.Router.init();
-
-            // Force Check on Load
-            App.Services.checkPremium();
 
             const fileInput = document.getElementById('image-upload');
             if (fileInput) {
