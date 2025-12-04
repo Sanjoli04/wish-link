@@ -210,7 +210,8 @@
 
         /* Themes */
         .bg-love {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            /* Updated for better contrast with Red Velvet */
+            background: radial-gradient(circle at center, #fff0f5 0%, #ffc1e3 60%, #f48fb1 100%);
         }
 
         .bg-midnight {
@@ -588,12 +589,14 @@
         // --- CAKE REGISTRY ---
         const CakeFactory = {
             // Reusable Candle Group (Scaled & Positioned for 300x400 viewbox)
+            // UPDATED: Added white stroke for better contrast
             getCandles(x, y) {
                 return `
                     <g transform="translate(${x}, ${y}) scale(0.3)">
                         <g class="candle">
-                            <rect x="-25" y="0" width="50" height="100" rx="8" fill="#ffd700" />
-                            <rect x="-15" y="-30" width="30" height="35" rx="4" fill="#ffed4e" />
+                            <!-- Added stroke for contrast -->
+                            <rect x="-25" y="0" width="50" height="100" rx="8" fill="#ffd700" stroke="white" stroke-width="4" />
+                            <rect x="-15" y="-30" width="30" height="35" rx="4" fill="#ffed4e" stroke="white" stroke-width="2" />
                             <g class="flame" style="transform-origin: 0px -30px;">
                                 <path d="M 0 -30 Q -15 -80 0 -120 Q 15 -80 0 -30" fill="#ffb700" style="filter: drop-shadow(0 0 10px #ffb700);"/>
                                 <path d="M 0 -35 Q -7 -70 0 -100 Q 7 -70 0 -35" fill="#ffd700" />
@@ -909,7 +912,8 @@
                             <use href="#single-cherry" x="245" y="215" />
                             <use href="#single-cherry" x="265" y="205" />
                         </g>
-                        ${this.getCandles(175, 220)}
+                        <!-- Updated Y coordinate to 180 (Top of Cake) -->
+                        ${this.getCandles(175, 180)}
                     </svg>
                 `;
             }
@@ -1679,13 +1683,15 @@
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
 
+                    // UPDATED: Mixed particles and emojis
                     const particles = Array.from({ length: 150 }, () => ({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height - canvas.height,
                         color: ['#FF0055', '#FFD700', '#00BFFF', '#32CD32'][Math.floor(Math.random() * 4)],
                         size: Math.random() * 8 + 2,
                         speedY: Math.random() * 3 + 2,
-                        speedX: Math.random() * 2 - 1
+                        speedX: Math.random() * 2 - 1,
+                        type: Math.random() > 0.85 ? 'gift' : 'square' // 15% chance to be a gift
                     }));
 
                     function loop() {
@@ -1693,8 +1699,15 @@
                         particles.forEach(p => {
                             p.y += p.speedY;
                             p.x += p.speedX;
-                            ctx.fillStyle = p.color;
-                            ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                            if (p.type === 'gift') {
+                                ctx.font = `${p.size * 2}px sans-serif`;
+                                ctx.fillText('🎁', p.x, p.y);
+                            } else {
+                                ctx.fillStyle = p.color;
+                                ctx.fillRect(p.x, p.y, p.size, p.size);
+                            }
+
                             if (p.y > canvas.height) p.y = -10;
                         });
                         requestAnimationFrame(loop);
