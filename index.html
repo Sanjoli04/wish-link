@@ -1655,7 +1655,7 @@
 
                     const bg = document.getElementById('bg-music');
                     const cheer = document.getElementById('cheer-audio');
-                    bg.pause();
+                    // bg.pause();  <-- REMOVED: Keep music playing
                     cheer.play();
 
                     App.Controllers.startConfetti();
