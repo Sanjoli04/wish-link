@@ -142,5 +142,13 @@ This project is licensed under the **MIT License**.
 GitHub: [Sanjoli Vashisth](https://github.com/Sanjoli04/)
 
 ---
+## 🔗 Live Demo
+
+You can view the live deployed version of WishLink here:
+
+👉 [WishLink](https://wishmagic.netlify.app/)
+
+- This demo showcases the UI, link creation flow, festive animations, and Razorpay integration (without performing real transactions).
+---
 
 ⭐ If you find this project useful or inspiring, consider giving it a star!
